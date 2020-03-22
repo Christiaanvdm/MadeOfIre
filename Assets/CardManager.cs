@@ -13,7 +13,7 @@ namespace Complete {
         private SkillManager skillManager;
         private SkillManager_Attack skillManager_Attack;
         private CombatManager combatManager;
-
+        public int cardType;                                        
 
         private Vector3 initialPosition;
         private Quaternion initialRotation;
@@ -40,12 +40,17 @@ namespace Complete {
         private PlayerManager playerManager;
 
         private bool isActive = true;
-
+        private Transform cooldownTransform;
+        private Vector3 initialCooldownScale;
 
 
         // Start is called before the first frame update
         void Start()
         {
+            if (cardType == 1) {
+                cooldownTransform = transform.Find("Cooldown");
+                initialCooldownScale = cooldownTransform.localScale;
+            }
 
             canvasCardsGameObject = GameObject.Find("HUDUICanvasCards");
             
@@ -72,6 +77,7 @@ namespace Complete {
             initialPosition = transform.localPosition;
             initialRotation = transform.localRotation;
             SnapToAttention();
+
                                                         
 
         }
@@ -89,13 +95,29 @@ namespace Complete {
 
         }
 
+        private float cooldownScale = 1;
+
+        private void CooldownCard() 
+        {
+            if (cooldownTransform != null)
+            {
+                cooldownScale -= 1 / skillManager.cooldown * Time.deltaTime;
+                if (cooldownScale < 0.001)
+                    cooldownScale = 0;
+                var cooldownFactor = cooldownScale;
+
+                cooldownTransform.localScale = new Vector3(initialCooldownScale.x, initialCooldownScale.y * cooldownScale, initialCooldownScale.z   );
+            }  
+        }
+
         private void FixedUpdate()
         {
             if (!isActive)
             {
                 if (!this.IsActive())
                 {
-                    canvasCardImage.fillAmount -= 1 / skillManager.cooldown * Time.deltaTime;
+                    CooldownCard();
+                    
                 }
                 if (Time.time > discardTime)
                 {
@@ -120,7 +142,8 @@ namespace Complete {
 
         public void DisableCard()
         {
-            canvasCardImage.fillAmount = 1;
+            cooldownScale = 1;
+            //canvasCardImage.fillAmount = 1;
             isActive = false;
             SnapToAttention();
             discardTime = Time.time + skillManager.cooldown;
@@ -222,15 +245,7 @@ namespace Complete {
                     combatManager.isDraggingACard = false;
                 }
 
-                //if (mouse_is_over_enemy)
-                //{
-                //    //skillOnEnemy();
-                //    enemyManager.OnCardMouseExit();
-                //}
-                //if (mouse_is_over_card)
-                //{
-
-                //}
+                
 
                 transform.localScale = initialScale;
                 offset = initialOffset;
@@ -241,15 +256,13 @@ namespace Complete {
 
         public void DiscardCard(bool ShoulDrawCard = true, bool ShouldAddToDiscardPile = true)
         {
-           
-        if (ShoulDrawCard)
+            if (ShoulDrawCard)
             {
                 DrawCard(ShouldAddToDiscardPile);
             }
             if (isActive)
             {
                 DisableCard();
-
             }
         }
 

@@ -17,6 +17,7 @@ namespace Complete
         private SkillDetail rewardCard = new SkillDetail();
         private bool isActive = true;
         private SpriteRenderer cardSprite;
+        private float cardScale = 1.5f;
         // Start is called before the first frame update
         void Start()
         {
@@ -105,14 +106,14 @@ namespace Complete
 
         private void EnlargeReward()
         {
-            card.transform.localScale = originalScale * 2;
+            card.transform.localScale = originalScale * cardScale;
             anim.SetBool("Highlight", true);
             turnLightOn();
         }
 
         private void ShrinkReward()
         {
-            card.transform.localScale = originalScale * 1 / 2;
+            card.transform.localScale = originalScale * (1 / cardScale);
             anim.SetBool("Highlight", false);
             turnLightOff();
         }

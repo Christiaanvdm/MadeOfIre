@@ -55,7 +55,7 @@
     {
       "requiresTarget": "None",
       "duration": 2.0,
-      "magnitude": 2.0,
+      "magnitude": 3.0,
       "type": "double_size",
       "projectileSpeed": 10.0,
       "projectileSize": 1.0,

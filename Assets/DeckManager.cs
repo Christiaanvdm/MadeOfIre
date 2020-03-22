@@ -188,11 +188,14 @@ namespace Complete {
 
         public void ClearCurrentDeck()
         {
-            foreach (Transform nextCard in currentCards)
+            if (currentCards.Count > 0)
             {
-                Destroy(nextCard.gameObject);
+                foreach (Transform nextCard in currentCards)
+                {
+                    Destroy(nextCard.gameObject);
+                }
+                currentCards.Clear();
             }
-            currentCards.Clear();
         }
 
 

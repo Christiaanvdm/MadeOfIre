@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 namespace Complete {
     public class RoomManager : MonoBehaviour
     {
@@ -15,7 +16,9 @@ namespace Complete {
         private PlayerManager playerManager;
         private GameObject rewardPodium;
         private int roomState = 0; //0 - New ; 1 - Enemies spawned ; 2 - Room cleared
-        private GameObject LightComplete; 
+        private GameObject LightComplete;
+
+        public int extraSpawnPoints = 10; 
        
          void Start()
         {
@@ -28,6 +31,37 @@ namespace Complete {
             playerManager = GameObject.Find("Player").GetComponent<PlayerManager>();
             rewardPodium.SetActive(false);
         }
+
+
+        void CreateExtraSpawnPoints()
+        {
+            Transform transformMin, transformMax;
+            transformMin = transform.parent.Find("Minimum");
+            transformMax = transform.parent.Find("Maximum");
+
+            for (int i = 0; i < extraSpawnPoints;  i++ ) {
+
+                var countOut = 0;
+                var pointIsValid = false;
+                while (!pointIsValid && countOut < 1000)
+                {
+                    countOut++;
+                    var randomPoint = new Vector3(Random.Range(transformMin.position.x, transformMax.position.x), transformMin.position.y, Random.Range(transformMin.position.z, transformMax.position.z));
+                    if (Physics.OverlapSphere(randomPoint, 1f).Length == 0)
+                    {
+                        var newSpawn = new GameObject();
+                        
+                        newSpawn.transform.position = randomPoint;
+                        spawnPoints.Add(newSpawn.transform);
+
+                        pointIsValid = true;
+                    };
+                }
+
+
+            }
+        }
+        
 
         // Update is called once per frame
         void Update()
@@ -91,6 +125,7 @@ namespace Complete {
             if ((other.gameObject.name == "Player") && roomState == 0)
             {
                 roomState = 1;
+                //CreateExtraSpawnPoints();
                 spawnEnemies();
                 closeDoors();
                 gameObject.layer = 16;
