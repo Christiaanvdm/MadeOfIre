@@ -1,0 +1,96 @@
+{
+  "current_deck": [
+    {
+      "requiresTarget": "None",
+      "duration": 4.0,
+      "magnitude": 2,
+      "type": "split_shot",
+      "projectileSpeed": 10.0,
+      "projectileSize": 1.0,
+      "projectileDamage": 0.0,
+      "skill_name": "",
+      "description": "Split Shot",
+      "skill_sprite_name": "SplitShot",
+      "cooldown": "1"
+    },
+    {
+      "requiresTarget": "None",
+      "duration": 4.0,
+      "magnitude": 2,
+      "type": "chain_shot",
+      "projectileSpeed": 10.0,
+      "projectileSize": 1.0,
+      "projectileDamage": 0.0,
+      "skill_name": "",
+      "description": "Chain Shot",
+      "skill_sprite_name": "ChainShot",
+      "cooldown": "1.5"
+    },
+    {
+      "requiresTarget": "None",
+      "duration": 4.0,
+      "magnitude": 0.5,
+      "type": "half_speed",
+      "projectileSpeed": 10.0,
+      "projectileSize": 1.0,
+      "projectileDamage": 0.0,
+      "skill_name": "",
+      "description": "Half Speed",
+      "skill_sprite_name": "HalfSpeed",
+      "cooldown": "1.5"
+    },
+    {
+      "requiresTarget": "None",
+      "duration": 2.0,
+      "magnitude": 2.0,
+      "type": "double_duration",
+      "projectileSpeed": 10.0,
+      "projectileSize": 1.0,
+      "projectileDamage": 0.0,
+      "skill_name": "",
+      "description": "Duration",
+      "skill_sprite_name": "Duration",
+      "cooldown": "1.5"
+    },
+    {
+      "requiresTarget": "None",
+      "duration": 2.0,
+      "magnitude": 2.0,
+      "type": "double_size",
+      "projectileSpeed": 10.0,
+      "projectileSize": 1.0,
+      "projectileDamage": 0.0,
+      "skill_name": "",
+      "description": "Size",
+      "skill_sprite_name": "Size",
+      "cooldown": "1.5"
+    },
+    {
+      "requiresTarget": "None",
+      "duration": 5.0,
+      "magnitude": 30,
+      "type": "blink",
+      "projectileSpeed": 10.0,
+      "projectileSize": 1.0,
+      "projectileDamage": 0.0,
+      "skill_name": "",
+      "description": "Short Teleport",
+      "skill_sprite_name": "Blink",
+      "cooldown": "1.5"
+    },
+    {
+      "requiresTarget": "None",
+      "duration": 5.0,
+      "magnitude": 2,
+      "type": "spawn_glacier",
+      "projectileSpeed": 10.0,
+      "projectileSize": 1.0,
+      "projectileDamage": 0.0,
+      "skill_name": "",
+      "description": "Create Glacier",
+      "skill_sprite_name": "SpawnGlacier",
+      "cooldown": "1.5"
+    }
+
+  ]
+}
