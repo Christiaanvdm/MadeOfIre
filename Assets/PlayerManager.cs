@@ -67,8 +67,6 @@ namespace Complete
             spriteOriginalScale = character.transform.localScale;
 
         }
-
-
         // Update is called once per frame
         void Update()
         {
@@ -77,9 +75,6 @@ namespace Complete
                 updateOrientation();
             }
         }
-
-            
-
         private void FixedUpdate()
         {
             checkDodgeRoll();
@@ -155,62 +150,6 @@ namespace Complete
             {
                 lookUp();
             }
-        
-            //if ((mouseRelativeToPlayer.x > 0) && (mouseRelativeToPlayer.z > 0))
-            //{
-            //    if (mouseRelativeToPlayer.x < mouseRelativeToPlayer.z)
-            //    {
-            //        lookUp();
-            //        //print("Up");
-            //    }
-            //    else
-            //    {
-            //        lookRight();
-            //        //print("Right");
-            //    }
-            //}
-            //if ((mouseRelativeToPlayer.x < 0) && (mouseRelativeToPlayer.z > 0))
-            //{
-            //    if (mouseRelativeToPlayer.x > mouseRelativeToPlayer.z * -1)
-            //    {
-            //        lookUp();
-            //        //print("Up");
-            //    }
-            //    else
-            //    {
-            //        lookLeft();
-            //        //print("Left");
-            //    }
-            //}
-            //if ((mouseRelativeToPlayer.x < 0) && (mouseRelativeToPlayer.z < 0))
-            //{
-            //    if (mouseRelativeToPlayer.x > mouseRelativeToPlayer.z)
-            //    {
-            //        lookDown();
-            //        //print("Down");
-            //    }
-            //    else
-            //    {
-            //        lookLeft();
-            //        //print("Left");
-            //    }
-            //}
-            //if ((mouseRelativeToPlayer.x > 0) && (mouseRelativeToPlayer.z < 0))
-            //{
-            //    if (mouseRelativeToPlayer.x < mouseRelativeToPlayer.z * -1)
-            //    {
-            //        lookDown();
-            //        //print("Down");
-            //    }
-            //    else
-            //    {
-            //        lookRight();
-            //        //print("Right");
-            //    }
-            //}
-
-
-
         }
 
         private void lookUp()
