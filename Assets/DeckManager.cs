@@ -18,7 +18,7 @@ namespace Complete {
         private Transform Keyboard;
 
         private List<Transform> CanvasPages = new List<Transform>();
-        private List<Transform> currentCards = new List<Transform>();
+        private List<Transform> currentCards;
         private Image newCardImage;
         private SkillDetail cardBeingAdded;
         private CombatManager combatManager;
@@ -29,6 +29,7 @@ namespace Complete {
         // Start is called before the first frame update
         void Start()
         {
+            currentCards = new List<Transform>();
             CanvasPages.Clear();
             canvas = gameObject.GetComponent<Canvas>();
             playerManager = GameObject.Find("Player").GetComponent<PlayerManager>();
@@ -38,6 +39,7 @@ namespace Complete {
                 if (trf.gameObject.name == "CurrentDeck")
                 {
                     CurrentDeck = trf;
+                    CanvasPages.Add(CurrentDeck);
                 }
                 else if (trf.gameObject.name == "SampleCard")
                 {
@@ -46,13 +48,16 @@ namespace Complete {
                 else if (trf.gameObject.name == "NewCard")
                 {
                     NewCard = trf;
+                    CanvasPages.Add(NewCard);
                 }
                 else if (trf.gameObject.name == "Keyboard")
                 {
                     Keyboard = trf;
+                    CanvasPages.Add(Keyboard);
                 }
                 else if (trf.gameObject.name == "DrawAndDiscard") {
                     DrawAndDiscard = trf;
+                    CanvasPages.Add(DrawAndDiscard);
                 }
                 else if (trf.gameObject.name == "Draw")
                 {
@@ -65,37 +70,20 @@ namespace Complete {
                 else if (trf.gameObject.name == "CurrentCards")
                 {
                     CurrentCards = trf;
+                    CanvasPages.Add(CurrentCards);
                 }
                 else if (trf.gameObject.name == "NewCardSprite")
                 {
                     newCardImage = trf.GetComponent<Image>();
+                    CanvasPages.Add(newCardImage.transform);
                 }
                 else if (trf.gameObject.name == "AddCardButton")
                 {
                     AddCardButton = trf;
+                    CanvasPages.Add(AddCardButton);
                 }
             }
-            //cardSample = transform.Find("SampleCard");
-            //CurrentDeck = transform.Find("CurrentDeck");
-            CanvasPages.Add(CurrentDeck);
-            //NewCard = transform.Find("NewCard");
-            CanvasPages.Add(NewCard);
-            //Keyboard = transform.Find("Keyboard");
-            CanvasPages.Add(Keyboard);
-            //DrawAndDiscard = transform.Find("DrawAndDiscard");
-            CanvasPages.Add(DrawAndDiscard);
-            //Draw = DrawAndDiscard.Find("Draw");
-            //Discard = DrawAndDiscard.Find("Discard");
-            CanvasPages.Add(AddCardButton);
-            //LoadPlayerDeckToPannel(CurrentDeck);
-            //LoadPlayerDeckToPannel(CurrentCards);
-            //CurrentCards = NewCard.Find("CurrentCards");
-            CanvasPages.Add(CurrentCards);
-            CanvasPages.Add(newCardImage.transform);
-
-            //newCardImage = NewCard.Find("NewCardSprite").GetComponent<Image>();
             combatManager = GameObject.Find("SceneManager").GetComponent<CombatManager>();
-            
         }
 
   
@@ -118,13 +106,13 @@ namespace Complete {
 
         void LoadListToPannel(Transform CardsParent, List<SkillDetail> Cards)
         {
-            int cardCount = 0;
+            int cardCount = 0;                  
             foreach (SkillDetail nextCard in Cards)
             {
                 cardCount += 1;
                 Transform newCard = Instantiate(cardSample, cardSample.position, cardSample.rotation);
                 newCard.gameObject.SetActive(true);
-                newCard.SetParent(CardsParent);
+                newCard.transform.parent = CardsParent;
                 var ActiveSprite = Resources.Load<Sprite>("ActiveCard" + nextCard.skill_sprite_name);
                 Image newSprite = newCard.GetComponent<Image>();
                 newSprite.sprite = ActiveSprite;
@@ -143,7 +131,7 @@ namespace Complete {
         {
             currentPodium = podium;
             ClearCurrentDeck();
-            Start();       
+            //Start();       
             DisableAllMenus();
             NewCard.gameObject.SetActive(true);
             CurrentCards.gameObject.SetActive(true);
@@ -152,7 +140,7 @@ namespace Complete {
             LoadListToPannel(CurrentCards, playerManager.current_deck);
         }
 
-        private void DisableAllMenus()
+        public void DisableAllMenus()
         {
             foreach (Transform nextMenu in CanvasPages)
             {
@@ -170,7 +158,7 @@ namespace Complete {
         public void ShowCurrentDeck()
         {
             ClearCurrentDeck();
-            Start();
+         //   Start();
             DisableAllMenus();
             LoadListToPannel(CurrentDeck, playerManager.current_deck);
             CurrentDeck.gameObject.SetActive(true);
@@ -179,7 +167,7 @@ namespace Complete {
         public void ShowDrawPile()
         {
             ClearCurrentDeck();
-            Start();
+          //  Start();
             DisableAllMenus();
             DrawAndDiscard.gameObject.SetActive(true);
             LoadPlayerDrawPileAndDiscardPile();
@@ -188,24 +176,20 @@ namespace Complete {
 
         public void ClearCurrentDeck()
         {
-            if (currentCards.Count > 0)
+            foreach (Transform nextCard in currentCards)
             {
-                foreach (Transform nextCard in currentCards)
-                {
-                    Destroy(nextCard.gameObject);
-                }
-                currentCards.Clear();
+                Destroy(nextCard.gameObject);
             }
+            currentCards.Clear();
         }
 
 
 
         public void AddCardMenu(SkillDetail newCard, PodiumManager podium)
         {
-            newCardImage.gameObject.SetActive(true);
             var newCardSprite = Resources.Load<Sprite>("ActiveCard" + newCard.skill_sprite_name);
             newCardImage.sprite = newCardSprite;
-            ShowAddCards(podium);
+            //ShowAddCards(podium);
             cardBeingAdded = newCard;
         }
 
