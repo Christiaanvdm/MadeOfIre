@@ -1,0 +1,35 @@
+﻿<Properties StartupConfiguration="{F2E0F4DA-C969-0C8D-A412-251389C46669}|">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/AttackProjectile.cs">
+    <Files>
+      <File FileName="Assets/EnemyAITypeBA.cs" Line="119" Column="14" />
+      <File FileName="Assets/EnemySpriteManager.cs" Line="5" Column="36" />
+      <File FileName="Assets/PodiumManager.cs" Line="58" Column="49" NotebookId="1" />
+      <File FileName="Assets/PlayerManager.cs" Line="638" Column="10" NotebookId="1" />
+      <File FileName="Assets/DeckManager.cs" Line="151" Column="53" NotebookId="1" />
+      <File FileName="Assets/RoomManager.cs" Line="48" Column="59" NotebookId="1" />
+      <File FileName="Assets/CardManager.cs" Line="57" Column="58" NotebookId="1" />
+      <File FileName="Assets/AttackProjectile.cs" Line="218" Column="13" NotebookId="1" />
+      <File FileName="Assets/SimpleTimer.cs" Line="82" Column="51" NotebookId="1" />
+      <File FileName="Assets/SkillManager.cs" Line="336" Column="84" NotebookId="1" />
+      <File FileName="Assets/EnemyManager2D.cs" Line="30" Column="43" NotebookId="1" />
+      <File FileName="Assets/PlayerCards.json" Line="10" Column="24" NotebookId="1" />
+      <File FileName="Assets/SaveDeck.cs" Line="29" Column="34" NotebookId="1" />
+      <File FileName="Assets/DoorManager.cs" Line="61" Column="48" NotebookId="1" />
+      <File FileName="Assets/CombatManager.cs" Line="358" Column="14" NotebookId="1" />
+      <File FileName="Assets/AttackModifier.cs" Line="9" Column="39" NotebookId="1" />
+      <File FileName="Assets/AllCards.json" Line="25" Column="9" NotebookId="1" />
+      <File FileName="Assets/CombatMovement2D.cs" Line="49" Column="15" NotebookId="1" />
+      <File FileName="Assets/DeathScreen.cs" Line="6" Column="5" NotebookId="1" />
+      <File FileName="Assets/EnemyAI2D.cs" Line="16" Column="33" NotebookId="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="Unity.Editor" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore>
+      <Breakpoint file="/Users/cvdm/Projects/Unity/MadeOfIre/Assets/EnemyManager2D.cs" relfile="Assets/EnemyManager2D.cs" line="36" column="1" />
+    </BreakpointStore>
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>

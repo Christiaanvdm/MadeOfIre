@@ -18,7 +18,7 @@ namespace Complete {
         private int roomState = 0; //0 - New ; 1 - Enemies spawned ; 2 - Room cleared
         private GameObject LightComplete;
 
-        public int extraSpawnPoints = 10; 
+        private int extraSpawnPoints = 5; 
        
          void Start()
         {
@@ -30,6 +30,7 @@ namespace Complete {
             enemySampleBA = Resources.Load("EnemyBA", typeof(GameObject)) as GameObject;
             playerManager = GameObject.Find("Player").GetComponent<PlayerManager>();
             rewardPodium.SetActive(false);
+            
         }
 
 
@@ -39,15 +40,17 @@ namespace Complete {
             transformMin = transform.parent.Find("Minimum");
             transformMax = transform.parent.Find("Maximum");
 
-            for (int i = 0; i < extraSpawnPoints;  i++ ) {
+            for (int i = 0; i < extraSpawnPoints; i++)
+            {
 
                 var countOut = 0;
                 var pointIsValid = false;
                 while (!pointIsValid && countOut < 1000)
                 {
                     countOut++;
-                    var randomPoint = new Vector3(Random.Range(transformMin.position.x, transformMax.position.x), transformMin.position.y, Random.Range(transformMin.position.z, transformMax.position.z));
-                    if (Physics.OverlapSphere(randomPoint, 1f).Length == 0)
+                    var randomPoint = new Vector3(Random.Range(transformMin.position.x, transformMax.position.x), 1.2f, Random.Range(transformMin.position.z, transformMax.position.z));
+                    var overlaps = Physics.OverlapSphere(randomPoint, 1f);
+                    if (overlaps.Length == 2)
                     {
                         var newSpawn = new GameObject();
                         
@@ -125,7 +128,7 @@ namespace Complete {
             if ((other.gameObject.name == "Player") && roomState == 0)
             {
                 roomState = 1;
-                //CreateExtraSpawnPoints();
+                CreateExtraSpawnPoints();
                 spawnEnemies();
                 closeDoors();
                 gameObject.layer = 16;
