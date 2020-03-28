@@ -72,6 +72,7 @@
     <Compile Include="Assets\CombatManager.cs" />
     <Compile Include="Assets\CombatMovement.cs" />
     <Compile Include="Assets\CombatMovement2D.cs" />
+    <Compile Include="Assets\ConnectorInit.cs" />
     <Compile Include="Assets\DeathScreen.cs" />
     <Compile Include="Assets\DeckManager.cs" />
     <Compile Include="Assets\DoorManager.cs" />
@@ -84,6 +85,7 @@
     <Compile Include="Assets\EnemyManager2D.cs" />
     <Compile Include="Assets\EnemyProjectile.cs" />
     <Compile Include="Assets\EnemySpriteManager.cs" />
+    <Compile Include="Assets\FloorGenerator.cs" />
     <Compile Include="Assets\Nova.cs" />
     <Compile Include="Assets\PlayerManager.cs" />
     <Compile Include="Assets\PodiumManager.cs" />
@@ -103,6 +105,8 @@
     <Compile Include="Assets\SimpleTimer.cs" />
     <Compile Include="Assets\SkillManager.cs" />
     <Compile Include="Assets\SkillManager_Attack.cs" />
+    <Compile Include="Assets\StartRoomInit.cs" />
+    <Compile Include="Assets\StartRoomManager.cs" />
     <Compile Include="Assets\TerrainManager.cs" />
     <Compile Include="Assets\TravelManager.cs" />
     <Compile Include="Assets\ZoneObject.cs" />
