@@ -90,7 +90,7 @@ namespace Complete
 
         void Attack()
         {
-          
+
             Vector3 shotDirection = (FindMousePointRelativeToPlayer() - player.transform.position).normalized;
             Rigidbody projectileInstance = Instantiate(projectileRigidbody, originTransform.position + new Vector3(0, 0.1f, -0.2f), originTransform.rotation) as Rigidbody;
             projectileInstance.velocity = shotDirection * projectileSpeed;
@@ -216,14 +216,14 @@ namespace Complete
                 ChainShot();
             }
             else if (type == "spawn_glacier")
-            {           
+            {
                     SpawnGlacier();
             }
             else if (type == "blink")
             {
-               
+
                     Blink();
- 
+
             }
         }
 
@@ -251,7 +251,6 @@ namespace Complete
 
         }
 
-
         private void ChainShot()
         {
             AttackModifier chainShot = MainCanvas.AddComponent<AttackModifier>();
@@ -262,7 +261,6 @@ namespace Complete
             //doubleDuration.transform.SetParent(MainCanvas.transform);
             combatManager.addAttackModifier(chainShot, cardManager);
         }
-
 
         private void SplitShot()
         {
@@ -287,7 +285,7 @@ namespace Complete
             combatManager.addAttackModifier(enemyHalfSpeed, cardManager);
         }
 
-      
+
         private void DoubleDuration()
         {
             AttackModifier doubleDuration = MainCanvas.AddComponent<AttackModifier>();
@@ -298,9 +296,6 @@ namespace Complete
             //doubleDuration.transform.SetParent(MainCanvas.transform);
             combatManager.addSkillModifier(doubleDuration, cardManager);
         }
-
-
-
 
         private void DoubleDamage()
         {
@@ -415,11 +410,5 @@ namespace Complete
             ExecuteSkill();
 
         }
-
-
-
-
     }
-
-
 }

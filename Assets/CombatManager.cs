@@ -226,13 +226,13 @@ namespace Complete
             {
                 SpaceUp();
             }
-      
+
         }
 
         void SpaceDown() {
-           
+
         }
-      
+
         void checkKey()
         {
             if (playerManager)
@@ -721,7 +721,7 @@ namespace Complete
         {
             update_count = 0;
             Vector3 spawnPoint = FindMousePointRelativeToPlayer();
-            spawnPoint.y = 0;
+            //spawnPoint.y = 0;
             Rigidbody terrainInstance = Instantiate(terrainTemplate, spawnPoint, terrainTemplate.rotation) as Rigidbody;
             tm = terrainInstance.gameObject.GetComponent<TerrainManager>();
             StartCoroutine("CheckForCollision");
@@ -780,7 +780,7 @@ namespace Complete
         {
             Vector3 mousePointOnFloor = FindMousePointOnFloor();
             mousePointOnFloor = new Vector3(mousePointOnFloor.x,
-                                            mousePointOnFloor.y - player.transform.position.y,
+                                            mousePointOnFloor.y,
                                             mousePointOnFloor.z);
             return mousePointOnFloor;
         }

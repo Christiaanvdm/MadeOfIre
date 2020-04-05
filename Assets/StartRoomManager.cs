@@ -9,7 +9,8 @@ namespace Complete
 {
 	public class StartRoomManager : MonoBehaviour
 	{
-		public GameObject exit;
+		public Transform exit;
+		
 		void Start() {
 			var hallways = Resources.LoadAll<GameObject>("Hallways/North");
 			var hallway = hallways.First();
@@ -17,7 +18,7 @@ namespace Complete
 			newHallways.transform.SetParent(this.transform.parent);
 			newHallways.transform.localPosition = exit.transform.localPosition;
 			newHallways.transform.position = exit.transform.position ;
-			newHallways.GetComponent<ConnectorInit>().SpawnRoom();
+			newHallways.GetComponent<ConnectorInit>().SpawnRoom(0);
 		}
 	}
 }

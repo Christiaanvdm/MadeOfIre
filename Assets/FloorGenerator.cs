@@ -14,7 +14,6 @@ namespace Complete
 			// Get starter room
 			var startRoom = Resources.Load("StartRoom", typeof(GameObject)) as GameObject;
 			startRoom.transform.position = new Vector3(0, 0, 0);
-
 		}
 	}
 }

@@ -86,7 +86,7 @@ namespace Complete {
             combatManager = GameObject.Find("SceneManager").GetComponent<CombatManager>();
         }
 
-  
+
 
         void LoadPlayerDeckToPannel(Transform CardsParent)
         {
@@ -106,7 +106,7 @@ namespace Complete {
 
         void LoadListToPannel(Transform CardsParent, List<SkillDetail> Cards)
         {
-            int cardCount = 0;                  
+            int cardCount = 0;
             foreach (SkillDetail nextCard in Cards)
             {
                 cardCount += 1;
@@ -129,9 +129,10 @@ namespace Complete {
 
         public void ShowAddCards(PodiumManager podium)
         {
+            Start();
             currentPodium = podium;
             ClearCurrentDeck();
-            //Start();       
+
             DisableAllMenus();
             NewCard.gameObject.SetActive(true);
             CurrentCards.gameObject.SetActive(true);
@@ -157,8 +158,9 @@ namespace Complete {
 
         public void ShowCurrentDeck()
         {
+            Start();
             ClearCurrentDeck();
-         //   Start();
+
             DisableAllMenus();
             LoadListToPannel(CurrentDeck, playerManager.current_deck);
             CurrentDeck.gameObject.SetActive(true);
@@ -166,12 +168,13 @@ namespace Complete {
 
         public void ShowDrawPile()
         {
+            Start();
             ClearCurrentDeck();
-          //  Start();
+
             DisableAllMenus();
             DrawAndDiscard.gameObject.SetActive(true);
             LoadPlayerDrawPileAndDiscardPile();
-          
+
         }
 
         public void ClearCurrentDeck()
@@ -211,7 +214,7 @@ namespace Complete {
             combatManager.LeaveMenu();
         }
 
-      
+
 
 
 

@@ -134,6 +134,7 @@ namespace Complete
                 MoveTowardsEnemy();
             }
             SnapSpriteToEnemy();
+            transform.position = new Vector3(transform.position.x, 1.4f, transform.position.z);
             //LookAtPlayer();
 
 
