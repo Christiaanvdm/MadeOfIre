@@ -9,16 +9,22 @@ namespace Complete
 {
 	public class StartRoomManager : MonoBehaviour
 	{
-		public Transform exit;
-		
+		private Transform exit;
+
 		void Start() {
-			var hallways = Resources.LoadAll<GameObject>("Hallways/North");
-			var hallway = hallways.First();
-			GameObject newHallways = Instantiate(hallway) as GameObject;
-			newHallways.transform.SetParent(this.transform.parent);
-			newHallways.transform.localPosition = exit.transform.localPosition;
-			newHallways.transform.position = exit.transform.position ;
-			newHallways.GetComponent<ConnectorInit>().SpawnRoom(0);
+			exit = transform.parent.Find("Exit");
+			SpawnRoom(0);
+		}
+
+		public void SpawnRoom(int mazeDepth)
+		{
+			var rooms = Resources.LoadAll<GameObject>("Rooms/South");
+			var room = rooms.First(x => x.name == "ARoom2");
+			GameObject newRoom = Instantiate(room) as GameObject;
+
+
+			newRoom.transform.position = exit.position + (newRoom.transform.position - newRoom.transform.Find("Entrance").position);
+			newRoom.transform.Find("RoomArea").GetComponent<RoomManager>().InitializeMap(mazeDepth);
 		}
 	}
 }

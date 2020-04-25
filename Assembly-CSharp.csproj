@@ -87,6 +87,7 @@
     <Compile Include="Assets\EnemySpriteManager.cs" />
     <Compile Include="Assets\FloorGenerator.cs" />
     <Compile Include="Assets\Nova.cs" />
+    <Compile Include="Assets\NPCController.cs" />
     <Compile Include="Assets\PlayerManager.cs" />
     <Compile Include="Assets\PodiumManager.cs" />
     <Compile Include="Assets\Projectile.cs" />
@@ -109,7 +110,12 @@
     <Compile Include="Assets\StartRoomManager.cs" />
     <Compile Include="Assets\TerrainManager.cs" />
     <Compile Include="Assets\TravelManager.cs" />
+    <Compile Include="Assets\TreeController.cs" />
     <Compile Include="Assets\ZoneObject.cs" />
+    <None Include="Assets\WIP\Fonts\SIL Open Font License.txt" />
+    <None Include="Assets\WIP\Dungeon\Rooms\Room1\AlwaysVisible.shader" />
+    <None Include="Assets\WIP\Dungeon\Rooms\Room2\Shaders\TreeShader.shader" />
+    <None Include="Assets\WIP\Dungeon\Rooms\Room2\Shaders\ShowPlayer.shader" />
     <None Include="Assets\Tanks!_Third-PartyNotice.txt" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>C:/UnityProjects/MadeOfIre/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>

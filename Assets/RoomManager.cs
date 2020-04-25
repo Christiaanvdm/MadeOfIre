@@ -44,23 +44,34 @@ namespace Complete
 			mazeDepth = _mazeDepth;
 			foreach (Transform exit in exits)
 			{
-				SpawnHallway(exit.transform);
+				SpawnRoomAtExit(exit.transform);
 			}
 		}
 
-		private void SpawnHallway(Transform exit) {
-			var hallways = Resources.LoadAll("Hallways/North");
-			var hallway = hallways.First();
-			GameObject newHallways = Instantiate(hallway) as GameObject;
-			newHallways.transform.SetParent(this.transform.parent);
-			newHallways.transform.localPosition = exit.localPosition;
-			newHallways.transform.position = exit.position;
-			mazeDepth++;
-			extraSpawnPoints += mazeDepth;
-			if (mazeDepth < maxDepth)
-			{
-				newHallways.GetComponent<ConnectorInit>().SpawnRoom(mazeDepth);
-			}
+		private void SpawnRoomAtExit(Transform exit) {
+			//var hallways = Resources.LoadAll("Hallways/North");
+			//var hallway = hallways.First();
+			//GameObject newHallways = Instantiate(hallway) as GameObject;
+			//newHallways.transform.SetParent(this.transform.parent);
+			//newHallways.transform.localPosition = exit.localPosition;
+			//newHallways.transform.position = exit.position;
+			//mazeDepth++;
+			//extraSpawnPoints += mazeDepth;
+			//if (mazeDepth < maxDepth)
+			//{
+			//	SpawnRoom(mazeDepth);
+			//}
+		}
+
+		public void SpawnRoom(int mazeDepth)
+		{
+			var rooms = Resources.LoadAll<GameObject>("Rooms/South");
+			var room = rooms.First(x => x.name == "ARoom2");
+			GameObject newRoom = Instantiate(room) as GameObject;
+			var entrance = transform.parent.Find("ExitN");
+
+			newRoom.transform.position = entrance.position + (newRoom.transform.position - newRoom.transform.Find("Entrance").position);
+			newRoom.transform.Find("RoomArea").GetComponent<RoomManager>().InitializeMap(mazeDepth);
 		}
 
 
@@ -78,7 +89,7 @@ namespace Complete
 				while (!pointIsValid && countOut < 1000)
 				{
 					countOut++;
-					var randomPoint = new Vector3(Random.Range(transformMin.position.x, transformMax.position.x), 1.2f, Random.Range(transformMin.position.z, transformMax.position.z));
+					var randomPoint = new Vector3(Random.Range(transformMin.position.x, transformMax.position.x), 0.4f, Random.Range(transformMin.position.z, transformMax.position.z));
 					var overlaps = Physics.OverlapSphere(randomPoint, 1f);
 					if (overlaps.Length == 2)
 					{
@@ -113,12 +124,15 @@ namespace Complete
 
 		void SpawnEnemy(Vector3 position, Quaternion rotation)
 		{
-			GameObject newEnemy = Instantiate(enemySample, position, rotation) as GameObject;
+			if (enemySample != null)
+			{
+				GameObject newEnemy = Instantiate(enemySample, position, rotation) as GameObject;
 
-			newEnemy.transform.SetParent(transform);
-			newEnemy.transform.position = new Vector3(newEnemy.transform.position.x, -0.6f, newEnemy.transform.position.z);
+				newEnemy.transform.SetParent(transform);
+				newEnemy.transform.position = new Vector3(newEnemy.transform.position.x, -0.6f, newEnemy.transform.position.z);
 
-			roomEnemies.Add(newEnemy);
+				roomEnemies.Add(newEnemy);
+			}
 		}
 
 		void spawnEnemies()

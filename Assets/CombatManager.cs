@@ -226,17 +226,39 @@ namespace Complete
             {
                 SpaceUp();
             }
+            if (Input.GetKey(KeyCode.Return))
+            {
+                ReturnDown();
+            }
+            else if (Input.GetKeyUp(KeyCode.Return))
+            {
+                ReturnUp();
+            }
+        }
+
+        void SpaceDown()
+        {
 
         }
 
-        void SpaceDown() {
+        void CDown() {
+            playerManager.AdvanceConversation();
+        }
+
+        void CUp() { }
+
+        void ReturnDown() {
+
+        }
+
+        void ReturnUp() {
 
         }
 
         void checkKey()
         {
             if (playerManager)
-             //&& playerManager.InCombat)
+            //&& playerManager.InCombat)
             {
                 if (Input.GetKey(KeyCode.Q))
                 {
@@ -319,6 +341,14 @@ namespace Complete
             else if (Input.GetKeyUp(KeyCode.F1))
             {
                 F1Up();
+            }
+            if (Input.GetKey(KeyCode.C))
+            {
+                CDown();
+            }
+            else if (Input.GetKeyUp(KeyCode.C))
+            {
+                CUp();
             }
 
         }

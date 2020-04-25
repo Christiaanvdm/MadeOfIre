@@ -24,12 +24,12 @@ public class CameraController : MonoBehaviour
         y = (y - 0.5f) * offsetMagnitude;
         offset.x = originalOffset.x + x;
         offset.y = originalOffset.y + y;
-       
+
     }
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     // LateUpdate is called after Update each frame
@@ -38,4 +38,5 @@ public class CameraController : MonoBehaviour
         // Set the position of the camera's transform to be the same as the player's, but offset by the calculated offset distance.
         transform.position = player.transform.position + offset;
     }
+
 }
