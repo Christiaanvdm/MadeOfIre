@@ -88,8 +88,10 @@
     <Compile Include="Assets\FloorGenerator.cs" />
     <Compile Include="Assets\Nova.cs" />
     <Compile Include="Assets\NPCController.cs" />
+    <Compile Include="Assets\OverlayController.cs" />
     <Compile Include="Assets\PlayerManager.cs" />
     <Compile Include="Assets\PodiumManager.cs" />
+    <Compile Include="Assets\PortalController.cs" />
     <Compile Include="Assets\Projectile.cs" />
     <Compile Include="Assets\ProjectileManager.cs" />
     <Compile Include="Assets\RobotMovementScript.cs" />
@@ -115,6 +117,7 @@
     <None Include="Assets\WIP\Fonts\SIL Open Font License.txt" />
     <None Include="Assets\WIP\Dungeon\Rooms\Room1\AlwaysVisible.shader" />
     <None Include="Assets\WIP\Dungeon\Rooms\Room2\Shaders\TreeShader.shader" />
+    <None Include="Assets\WIP\Dungeon\Rooms\Room2\Shaders\StandardPlayerBackgroundFade.shader" />
     <None Include="Assets\WIP\Dungeon\Rooms\Room2\Shaders\ShowPlayer.shader" />
     <None Include="Assets\Tanks!_Third-PartyNotice.txt" />
     <Reference Include="Unity.Timeline.Editor">

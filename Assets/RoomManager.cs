@@ -28,8 +28,8 @@ namespace Complete
 		void Start()
 		{
 			entrance = transform.Find("Entrance");
-			LightComplete = GameObject.Find("LightComplete");
-			LightComplete.SetActive(false);
+			//LightComplete = GameObject.Find("LightComplete");
+			//LightComplete.SetActive(false);
 			rewardPodium = transform.Find("Podium").gameObject;
 			enemySample = Resources.Load("Enemy", typeof(GameObject)) as GameObject;
 			enemySampleA = Resources.Load("EnemyA", typeof(GameObject)) as GameObject;
@@ -42,26 +42,13 @@ namespace Complete
 		public void InitializeMap(int _mazeDepth)
 		{
 			mazeDepth = _mazeDepth;
-			foreach (Transform exit in exits)
-			{
-				SpawnRoomAtExit(exit.transform);
-			}
+			mazeDepth += 1;
+			if (mazeDepth > maxDepth)
+				return;
+			SpawnHallways(mazeDepth);
 		}
 
-		private void SpawnRoomAtExit(Transform exit) {
-			//var hallways = Resources.LoadAll("Hallways/North");
-			//var hallway = hallways.First();
-			//GameObject newHallways = Instantiate(hallway) as GameObject;
-			//newHallways.transform.SetParent(this.transform.parent);
-			//newHallways.transform.localPosition = exit.localPosition;
-			//newHallways.transform.position = exit.position;
-			//mazeDepth++;
-			//extraSpawnPoints += mazeDepth;
-			//if (mazeDepth < maxDepth)
-			//{
-			//	SpawnRoom(mazeDepth);
-			//}
-		}
+
 
 		public void SpawnRoom(int mazeDepth)
 		{
@@ -72,6 +59,23 @@ namespace Complete
 
 			newRoom.transform.position = entrance.position + (newRoom.transform.position - newRoom.transform.Find("Entrance").position);
 			newRoom.transform.Find("RoomArea").GetComponent<RoomManager>().InitializeMap(mazeDepth);
+		}
+
+		public void SpawnHallways(int mazeDepth)
+		{
+			foreach (Transform exit in exits) {
+				SpawnHallway(exit);
+			}
+
+		}
+
+		public void SpawnHallway(Transform exit) {
+			var rooms = Resources.LoadAll<GameObject>("Hallways/North");
+			var room = rooms.First(x => x.name == "Straight");
+			GameObject newRoom = Instantiate(room) as GameObject;
+
+			newRoom.transform.position = exit.position + (newRoom.transform.position - newRoom.transform.Find("Entrance").position);
+			//newRoom.GetComponent<ConnectorInit>().SpawnRoom(mazeDepth);
 		}
 
 

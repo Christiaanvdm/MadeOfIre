@@ -56,7 +56,7 @@
 				 float dist = distance(input.worldPos.xyz, _Position.xyz);
 				 dist = clamp(dist, _MinDistance, _MaxDistance);
 				 dist = (dist - _MinDistance) / (_MaxDistance - _MinDistance);
-
+				 dist = max(0.2, dist);
 				 float4 color = tex2D(_MainTex, float2(input.tex.xy));
 				 if (color.a < _CutOff) discard;
 
