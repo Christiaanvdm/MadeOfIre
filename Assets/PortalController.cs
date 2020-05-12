@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Complete {
     public class PortalController : MonoBehaviour
@@ -43,6 +44,7 @@ namespace Complete {
                 var overlay = Transform.FindObjectOfType<OverlayController>();
                 overlay.showOverlay();
                 yield return new WaitForSeconds(0.25f);
+                SceneManager.LoadScene("SampleScene");
                 other.transform.position = other.transform.position + new Vector3(0, 0, 1000);
                 var rooms = Resources.LoadAll<GameObject>("Rooms/South");
                 var room = rooms.First(x => x.name == "ARoom2");

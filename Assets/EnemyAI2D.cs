@@ -34,7 +34,7 @@ namespace Complete
         void Start()
         {
             colliderTransform = transform.Find("Collider");
-           
+
             LoadSprite();
             SetupBase();
             originalUp = transform.up;
@@ -121,7 +121,7 @@ namespace Complete
                 if (EnemyLineOfSight())
                 {
                     FireAtEnemy();
-                   
+
                 }
             }
 
@@ -169,7 +169,7 @@ namespace Complete
 
         void LookAtPlayer()
         {
-        
+
             transform.LookAt(player.transform);
             updateOrientation((player.transform.position - transform.position).normalized);
 
@@ -230,10 +230,6 @@ namespace Complete
                     //print("Right");
                 }
             }
-
-
-
-
         }
         private string current_orientation;
         private void lookUp()

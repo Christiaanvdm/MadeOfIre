@@ -5,11 +5,18 @@ using UnityEngine.AI;
 
 namespace Complete
 {
-    public class EnemyManager2D : MonoBehaviour
+
+    public interface IEnemyController
+    {
+        void HitByProjectile(AttackProjectile projectile);
+        Transform parentTransform { get; }
+        void addDebuff(AttackModifier attackModifier);
+    }
+
+    public class EnemyManager2D : MonoBehaviour, IEnemyController
     {
         private CombatManager combatManager;
         private Renderer healthOrbRenderer;
-
         private float maximumHealth = 30f;
         private float minimumHealth = 0f;
         private float currentHealth = 30f;
@@ -28,9 +35,11 @@ namespace Complete
         private Collider body;
         private RoomManager roomManager;
         private NavMeshAgent navMeshAgent;
+
         // Start is called before the first frame update
         void Start()
         {
+
             rigidBody = gameObject.GetComponent<Rigidbody>();
             roomManager = transform.parent.gameObject.GetComponent<RoomManager>();
             combatManager = GameObject.Find("SceneManager").GetComponent<CombatManager>();
@@ -65,9 +74,9 @@ namespace Complete
             {
                 AttackModifier newAM = new AttackModifier();
                 newAM = nextAM;
-                
+
                 addDebuff(newAM);
-                
+
             }
             //a
         }
@@ -96,7 +105,7 @@ namespace Complete
                 newAM.magnitude = amToAdd.magnitude;
                 navMeshAgent.speed = navMeshAgent.speed * newAM.magnitude;
                 currentDebufs.Add(newAM);
-                newAM.transform.SetParent(transform); 
+                newAM.transform.SetParent(transform);
                 newAM.startTimer(amToAdd, enemyManager);
             }
         }
@@ -115,12 +124,12 @@ namespace Complete
 
         private void FixedUpdate()
         {
-         
+
         }
         // Update is called once per frame
         void Update()
         {
-            
+
         }
 
         private void UpdateHealthDisplay()
@@ -168,7 +177,7 @@ namespace Complete
             }
         }
 
-      
+
 
         public void OnCardMouseEnter()
         {
@@ -218,5 +227,6 @@ namespace Complete
             }
         }
 
+        Transform IEnemyController.parentTransform => transform;
     }
 }

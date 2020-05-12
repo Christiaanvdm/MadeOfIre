@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Complete {
     public class EnemySpriteManager : MonoBehaviour
     {
-        public EnemyManager2D enemy;
+        public IEnemyController enemy;
         public EnemyAITypeBA enemyBA;
         // Start is called before the first frame update
         void Start()
@@ -18,4 +18,6 @@ namespace Complete {
 
         }
     }
+
+
 }

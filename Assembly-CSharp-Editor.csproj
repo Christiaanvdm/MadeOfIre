@@ -64,6 +64,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Editor\MoveSceneViewCamera.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\Editor\MapManagerInspector.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\ReorderableList\Example\Editor\ExampleEditor.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\ReorderableList\Example\Editor\GameObjectEditor.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\ReorderableList\Example\Editor\NameOverrideEditor.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\ReorderableList\Example\Editor\NestedChildDrawer.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\ReorderableList\Example\Editor\SurrogateTestEditor.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\ReorderableList\List\Editor\ReorderableDrawer.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\ReorderableList\List\Editor\ReorderableList.cs" />
     <Reference Include="UnityEditor.TestRunner">
       <HintPath>C:/UnityProjects/MadeOfIre/Library/ScriptAssemblies/UnityEditor.TestRunner.dll</HintPath>
     </Reference>
@@ -285,6 +293,15 @@
     </Reference>
     <Reference Include="SyntaxTree.VisualStudio.Unity.Bridge">
       <HintPath>C:/Program Files (x86)/Microsoft Visual Studio Tools for Unity/16.0/Editor/SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
+    </Reference>
+    <Reference Include="DOTween">
+      <HintPath>C:/UnityProjects/MadeOfIre/Assets/slay-the-spire-map-in-unity/Assets/Demigiant/DOTween/DOTween.dll</HintPath>
+    </Reference>
+    <Reference Include="DOTweenEditor">
+      <HintPath>C:/UnityProjects/MadeOfIre/Assets/slay-the-spire-map-in-unity/Assets/Demigiant/DOTween/Editor/DOTweenEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>C:/UnityProjects/MadeOfIre/Assets/slay-the-spire-map-in-unity/Assets/JsonDotNet/Assemblies/Standalone/Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
       <HintPath>C:/UnityProjects/MadeOfIre/Library/PackageCache/com.unity.ext.nunit@1.0.0/net35/unity-custom/nunit.framework.dll</HintPath>

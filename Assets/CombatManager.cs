@@ -50,11 +50,14 @@ namespace Complete
         private DeckManager deckManager;
         private DeathScreen deathScreen;
 
+        public string currentRoom = "StartRoom";
+
         Quaternion initialOrientation;
         // Start is called before the first frame update
         void Start()
         {
-
+            if (StaticCombatLevel.currentRoom == null)
+                StaticCombatLevel.currentRoom = "StartRoom";
             deathScreen = Resources.FindObjectsOfTypeAll<DeathScreen>()[0];
             deathScreen.gameObject.SetActive(false);
             DeckManagerGO = Resources.FindObjectsOfTypeAll<DeckManager>()[0].gameObject;
@@ -71,8 +74,19 @@ namespace Complete
             healthSample = GameObject.Find("Health");
             deckManager = DeckManagerGO.GetComponent<DeckManager>();
             UpdateHUDHealth(6);
+            SpawnRoom();
 
 
+        }
+
+        public void SpawnRoom()
+        {
+            var room = Resources.Load<GameObject>($"Rooms/{StaticCombatLevel.currentRoom}");
+
+            GameObject newRoom = Instantiate(room) as GameObject;
+            var entrance = transform.Find("Exit");
+
+            newRoom.transform.position = GameObject.Find("RoomOrigin").transform.position;
         }
 
         // Update is called once a frame
@@ -817,6 +831,9 @@ namespace Complete
 
     }
 
+    public static class StaticCombatLevel {
+        public static string currentRoom { get; set; }
+    }
 
 
 }

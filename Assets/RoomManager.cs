@@ -24,10 +24,12 @@ namespace Complete
 		public int mazeDepth;
 		private int extraSpawnPoints = 0;
 		private int maxDepth = 30;
+		private List<GameObject> enemies;
 
 		void Start()
 		{
 			entrance = transform.Find("Entrance");
+			enemies = FindObjectsOfType<GameObject>().Where(x => x.tag == "enemy").ToList();
 			//LightComplete = GameObject.Find("LightComplete");
 			//LightComplete.SetActive(false);
 			rewardPodium = transform.Find("Podium").gameObject;
@@ -36,7 +38,7 @@ namespace Complete
 			enemySampleBA = Resources.Load("EnemyBA", typeof(GameObject)) as GameObject;
 			playerManager = GameObject.Find("Player").GetComponent<PlayerManager>();
 			rewardPodium.SetActive(false);
-
+			enemies.ForEach(x => x.SetActive(false));
 		}
 
 		public void InitializeMap(int _mazeDepth)
@@ -150,6 +152,7 @@ namespace Complete
 			{
 				enemy.transform.rotation = Quaternion.identity;
 			}
+			enemies.ForEach(x => x.SetActive(true));
 		}
 
 		void closeDoors()
