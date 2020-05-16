@@ -183,12 +183,10 @@ namespace Complete
                 if (direction.x < direction.z)
                 {
                     lookUp();
-                    //print("Up");
                 }
                 else
                 {
                     lookRight();
-                    //print("Right");
                 }
             }
             if ((direction.x < 0) && (direction.z > 0))
@@ -196,12 +194,10 @@ namespace Complete
                 if (direction.x > direction.z * -1)
                 {
                     lookUp();
-                    //print("Up");
                 }
                 else
                 {
                     lookLeft();
-                    //print("Left");
                 }
             }
             if ((direction.x < 0) && (direction.z < 0))
@@ -237,10 +233,6 @@ namespace Complete
 
             if (current_orientation != "up")
             {
-                //anim.parameters[1].defaultBool = true;
-                //anim.SetBool("Up", true);
-                //anim.SetBool("Right", false);
-                //anim.SetBool("Left", false);
                 anim.SetInteger("State", 1);
 
                 current_orientation = "up";
@@ -251,10 +243,6 @@ namespace Complete
         {
             if (current_orientation != "down")
             {
-                //anim.SetBool("Down", true);
-                //anim.SetBool("Up", false);
-                //anim.SetBool("Right", false);
-                //anim.SetBool("Left", false);
                 anim.SetInteger("State", 3);
                 current_orientation = "down";
             }

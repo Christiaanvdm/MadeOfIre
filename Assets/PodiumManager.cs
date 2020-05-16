@@ -9,7 +9,7 @@ namespace Complete
     {
         private GameObject player;
         private Animator anim;
-        private GameObject card;
+        private List<GameObject> cards = new List<GameObject>();
         private Vector3 originalScale;
         private Light light;
         private CombatManager combatManager;
@@ -23,24 +23,32 @@ namespace Complete
         {
             player = GameObject.Find("Player");
             anim = gameObject.transform.Find("Sprite").gameObject.GetComponent<Animator>();
-            card = gameObject.transform.Find("Card").gameObject;
-            originalScale = card.transform.localScale;
+            SetupCards();
             light = transform.Find("Light").GetComponent<Light>();
             combatManager = GameObject.Find("SceneManager").GetComponent<CombatManager>();
             deckManager = Resources.FindObjectsOfTypeAll<DeckManager>()[0];
-            GameObject spriteRenderGO = card.transform.Find("Sprite").gameObject;
-            cardSprite = spriteRenderGO.GetComponent<SpriteRenderer>();
-            cardSprite = card.transform.Find("Sprite").GetComponent<SpriteRenderer>();
+
             loadCardReward();
+        }
+
+
+        private void SetupCards() {
+            cards.Add(gameObject.transform.Find("Card1").gameObject);
+            cards.Add(gameObject.transform.Find("Card2").gameObject);
+            cards.Add(gameObject.transform.Find("Card3").gameObject);
+            originalScale = cards[0].transform.localScale;
         }
 
 
 
         void loadCardReward()
         {
-            rewardCard = getRandomSkillDetailFromAllCards();
-            var newCardImage = Resources.Load<Sprite>("ActiveCard" + rewardCard.skill_sprite_name);
-            cardSprite.sprite = newCardImage;
+            foreach (var card in cards) {
+                rewardCard = getRandomSkillDetailFromAllCards();
+                var newCardImage = Resources.Load<Sprite>("ActiveCard" + rewardCard.skill_sprite_name);
+                card.GetComponentInChildren<SpriteRenderer>().sprite = newCardImage;
+            }
+
         }
 
         // Update is called once per frame
@@ -62,13 +70,13 @@ namespace Complete
         }
 
         private void FixedUpdate()
-        { 
+        {
             if (isActive)
             {
                 float distance = Vector3.Distance(player.transform.position, transform.position);
                 if (distance < 2)
                 {
-                    EnlargeReward();
+                    EnlargeRewards();
                 }
                 else
                 {
@@ -82,38 +90,44 @@ namespace Complete
 
             if (isActive)
             {
-            
+
                 // Show add card menu
                 deckManager.ShowAddCards(this);
                 combatManager.EnterMenu(rewardCard, this);
             }
-        
+
         }
 
         private void OnMouseOver()
         {
             if (isActive)
             {
-                EnlargeReward();
+                EnlargeRewards();
             }
         }
 
         private void OnMouseExit()
         {
-
             ShrinkReward();
         }
 
-        private void EnlargeReward()
+        private void EnlargeRewards()
         {
-            card.transform.localScale = originalScale * cardScale;
+            foreach (var card in cards) {
+                card.transform.localScale = originalScale * cardScale;
+            }
+
             anim.SetBool("Highlight", true);
             turnLightOn();
         }
 
         private void ShrinkReward()
         {
-            card.transform.localScale = originalScale * (1 / cardScale);
+            foreach (var card in cards)
+            {
+                card.transform.localScale = originalScale * (1 / cardScale);
+            }
+
             anim.SetBool("Highlight", false);
             turnLightOff();
         }
@@ -143,7 +157,7 @@ namespace Complete
         public void DisablePodium()
         {
             isActive = false;
-            card.SetActive(false);
+            //card.SetActive(false);
         }
     }
 }

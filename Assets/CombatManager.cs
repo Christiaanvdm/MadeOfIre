@@ -158,6 +158,9 @@ namespace Complete
                     {
                         ApplyChainToProjectile(ref projectile, nextAM);
                     }
+                    if (nextAM.type == "bounce") {
+                        AddBounceToProject(ref projectile, nextAM);
+                    }
 
                 }
             }
@@ -168,6 +171,12 @@ namespace Complete
             nextAM.context = "Hit";
             projectile.AddModifier(nextAM);
         }
+
+
+        private void AddBounceToProject(ref AttackProjectile projectile, AttackModifier nextAM) {
+            projectile.AddBounces(Mathf.RoundToInt(nextAM.magnitude));
+        }
+
         public void UpdateHUDHealth(int newHP)
         {
             int healthCount = healthIcons.Count;

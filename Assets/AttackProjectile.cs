@@ -11,6 +11,8 @@ namespace Complete
         public float knockback = 0.1f;
         public float daze_duration = 0.5f;
         private bool alive = true;
+
+        private int bounces = 0;
         public Rigidbody rigidBody;
         private GameObject sprite;
         public AudioSource CollisionAudio;
@@ -32,6 +34,11 @@ namespace Complete
         {
             childSprite.transform.SetPositionAndRotation(childSprite.transform.position, exampleSprite.transform.rotation);
         }
+
+        public void AddBounces(int number) {
+            bounces += number;
+        }
+
 
         // Start is called before the first frame update
         void Start()
@@ -207,14 +214,23 @@ namespace Complete
                 {
 
                     IEnemyController enemyManager = other.gameObject.GetComponentInParent<IEnemyController>();
+                    if (enemyManager == null)
+                        enemyManager = other.gameObject.GetComponent<IEnemyController>();
                     HitEnemy(enemyManager);
                     enemyManager.HitByProjectile(this.GetComponent<AttackProjectile>());
 
-                    Despawn();
+                    Bounce();
                 }
-                Despawn();
+                Bounce();
             }
 
+        }
+
+        private void Bounce() {
+            if (bounces > 0)
+                bounces -= 1;
+            else
+                Despawn();
         }
 
         private void OnCollisionExit(Collision other)

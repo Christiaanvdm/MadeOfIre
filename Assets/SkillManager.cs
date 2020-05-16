@@ -217,16 +217,27 @@ namespace Complete
             }
             else if (type == "spawn_glacier")
             {
-                    SpawnGlacier();
+                SpawnGlacier();
             }
             else if (type == "blink")
             {
 
-                    Blink();
-
+                Blink();
+            }
+            else if (type == "bounce") {
+                Bounce();
             }
         }
 
+
+        private void Bounce() {
+            AttackModifier bounceShot = MainCanvas.AddComponent<AttackModifier>();
+            bounceShot.duration = duration;
+            bounceShot.magnitude = magnitude;
+            bounceShot.type = type;
+            bounceShot.icon_name = skill_sprite_name + "Icon";
+            combatManager.addAttackModifier(bounceShot, cardManager);
+        }
         private void Blink()
         {
             player.transform.position = FindMousePointRelativeToPlayer();
@@ -258,7 +269,6 @@ namespace Complete
             chainShot.magnitude = magnitude;
             chainShot.type = type;
             chainShot.icon_name = skill_sprite_name + "Icon";
-            //doubleDuration.transform.SetParent(MainCanvas.transform);
             combatManager.addAttackModifier(chainShot, cardManager);
         }
 

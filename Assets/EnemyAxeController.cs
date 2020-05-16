@@ -16,9 +16,7 @@ public class EnemyAxeController : MonoBehaviour, IEnemyController
     private float bulletVelocity = 9f;
     private int numberOfBullets = 30;
     private float health = 20f;
-
-    private List<GameObject> axeBullets = new List<GameObject>();
-
+    private Quaternion initialRotation;
     private bool finalDeath = false;
     // Start is called before the first frame update
     void Start()
@@ -39,17 +37,6 @@ public class EnemyAxeController : MonoBehaviour, IEnemyController
 
     }
 
-    private void EnableBullets() {
-        foreach (var bullet in axeBullets)
-            bullet.SetActive(true);
-    }
-
-    private void DisableBullets()
-    {
-        foreach (var bullet in axeBullets)
-            bullet.SetActive(false);
-    }
-
     private void FixedUpdate()
     {
         if (!(finalDeath))
@@ -60,40 +47,37 @@ public class EnemyAxeController : MonoBehaviour, IEnemyController
         transform.rotation = initialRotation;
     }
 
-    private void LookAtPlayer() {
+    private void LookAtPlayer()
+    {
 
     }
-
-    IEnumerator AttackEnemy() {
-        while (!finalDeath) {
-            yield return new WaitForSeconds(5f);
-
+    IEnumerator AttackEnemy()
+    {
+        while (!finalDeath)
+        {
+            var waitDuration = UnityEngine.Random.Range(4f, 6f);
+            yield return new WaitForSeconds(waitDuration);
             StartCoroutine(SwingAxe());
-
         }
     }
 
-    IEnumerator SwingAxe() {
+    IEnumerator SwingAxe()
+    {
         bool swung = false;
-        while (!swung && !finalDeath) {
-
+        while (!swung && !finalDeath)
+        {
             anim.SetInteger("Attack", 1);
-
             yield return new WaitForSeconds(0.5f);
-
             anim.SetInteger("Attack", 0);
             SpawnAndFireBulletsCircle();
-            //StartCoroutine(spawnAndFireBullets());
             yield return new WaitForSeconds(1f);
-
             swung = true;
-            //yield return new WaitForSeconds(10f);
-
         }
         yield return null;
     }
 
-    private void SpawnAndFireBulletsCircle() {
+    private void SpawnAndFireBulletsCircle()
+    {
         var fireTrajectory = (colliderTransform.position - player.position).normalized;
         int intervals = numberOfBullets;
         float radius = 2;
@@ -103,7 +87,6 @@ public class EnemyAxeController : MonoBehaviour, IEnemyController
         float currentDegree = -45 * (Mathf.PI / 180);
         for (int i = 0; i < intervals; i++)
         {
-
             Vector3 offset = new Vector3(Mathf.Cos(currentDegree) * radius, 0, Mathf.Sin(currentDegree) * radius);
             var nextBullet = Instantiate(projectilePrefab, currentPos + offset, transform.rotation);
             fireTrajectory = offset.normalized;
@@ -112,30 +95,18 @@ public class EnemyAxeController : MonoBehaviour, IEnemyController
         }
     }
 
-
-    private Quaternion initialRotation;
-
     private void MoveTowardsEnemy()
     {
-
         navMeshAgent.SetDestination(player.transform.position);
     }
 
     protected void Death()
     {
-        transform.GetComponent<NavMeshAgent>().speed = 0;
+        transform.GetComponent<NavMeshAgent>().speed = 0f;
         finalDeath = true;
         anim.SetBool("Dead", true);
         colliderTransform.gameObject.SetActive(false);
-        enemySprite.transform.position = new Vector3(transform.position.x, 0.2f, transform.position.z);
-        //StartCoroutine(SlightlyAfterDeath());
-    }
-
-    IEnumerator SlightlyAfterDeath()
-    {
-        yield return new WaitForSeconds(2f);
-        gameObject.SetActive(false);
-        yield return null;
+        enemySprite.transform.position = new Vector3(transform.position.x, 0.405f, transform.position.z);
     }
 
     public void HitByProjectile(AttackProjectile projectile)
