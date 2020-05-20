@@ -1,18 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 namespace Complete
 {
     public class AttackProjectile : MonoBehaviour
     {
-        public float damage = 10f;
+        public float damage = 1f;
         public float scale = 1f;
         public float speed = 0f;
         public float knockback = 0.1f;
         public float daze_duration = 0.5f;
         private bool alive = true;
 
-        private int bounces = 0;
+        public int bounces = 0;
         public Rigidbody rigidBody;
         private GameObject sprite;
         public AudioSource CollisionAudio;
@@ -35,7 +36,8 @@ namespace Complete
             childSprite.transform.SetPositionAndRotation(childSprite.transform.position, exampleSprite.transform.rotation);
         }
 
-        public void AddBounces(int number) {
+        public void AddBounces(int number)
+        {
             bounces += number;
         }
 
@@ -47,8 +49,15 @@ namespace Complete
             originalRotation = gameObject.transform.rotation;
             player = GameObject.Find("Player");
             sprite = gameObject.transform.Find("Sprite").gameObject;
-            rigidBody = gameObject.GetComponent<Rigidbody>();
 
+
+        }
+
+        IEnumerator despawnAfterFixedInterval() {
+            while (true) {
+                yield return new WaitForSeconds(6f);
+                Despawn();
+            }
         }
 
         public void updateScale(float multiplier)
@@ -73,8 +82,10 @@ namespace Complete
 
         public void AddModifier(AttackModifier newAM)
         {
-            if (newAM.context == "Birth") {
-                birthModifiers.Add(newAM); }
+            if (newAM.context == "Birth")
+            {
+                birthModifiers.Add(newAM);
+            }
             else if (newAM.context == "Enemy")
             {
                 enemyModifiers.Add(newAM);
@@ -105,7 +116,9 @@ namespace Complete
 
         public void StartUp()
         {
-            exampleProjectile = GameObject.Find("AttackProjectile");
+            GroupAttackModifiers();
+            rigidBody = gameObject.GetComponent<Rigidbody>();
+            exampleProjectile = Resources.Load<GameObject>("AttackProjectile");
             childSprite = rigidBody.transform.Find("Sprite").gameObject;
             exampleSprite = exampleProjectile.transform.Find("Sprite").gameObject;
             //renderer = rigidbody.gameObject.GetComponent<Renderer>();
@@ -114,7 +127,32 @@ namespace Complete
 
         }
 
+        private void GroupAttackModifiers()
+        {
+            var groupedModifiersList = new List<AttackModifier>();
+            var groupedBirthModifiers = birthModifiers.GroupBy(x => x.type).ToList();
+            AttackModifier nextAm = new AttackModifier();
+            foreach (var group in groupedBirthModifiers)
+            {
+                bool first = true;
+                foreach (var item in group)
+                {
+                    if (first)
+                    {
+                        nextAm = new AttackModifier();
+                        first = false;
+                    };
+                    nextAm.duration = item.duration;
+                    nextAm.magnitude += item.magnitude;
+                    nextAm.icon_name = item.icon_name;
+                    nextAm.is_enabled = item.is_enabled;
+                    nextAm.type = item.type;
+                }
+                groupedModifiersList.Add(nextAm);
+            }
+            this.birthModifiers = groupedModifiersList;
 
+        }
 
         private void Birth()
         {
@@ -123,19 +161,14 @@ namespace Complete
             {
                 if (nextAM.is_enabled && (nextAM.type == "split_shot"))
                 {
-                    Vector3 shotDirection = (FindMousePointRelativeToPlayer() - player.transform.position).normalized;
-                    //print(shotDirection);
-                    //Rigidbody projectileInstance = Instantiate(projectileRigidbody, originTransform.position, originTransform.rotation) as Rigidbody;
-                    //projectileInstance.velocity = shotDirection * projectileSpeed;
+                    for (int i = 0; i < nextAM.magnitude + 1; i++)
+                    {
+                        float angleAdjustment = 30 + i * (60 / nextAM.magnitude + 1);
+                        if (angleAdjustment != 0) {
+                            FireAnotherProjectile(offsetDirectionByAngle(rigidBody.velocity.normalized, -30 + angleAdjustment), rigidBody.transform.position);
+                        }
 
-                    //projectileInstance.transform.right = -1 * shotDirection;
-                    //AttackProjectile nextAP = projectileInstance.GetComponent<AttackProjectile>();
-                    //nextAP.speed = projectileSpeed;
-                    //combatManager.ModifyProjectile(ref nextAP);
-                    //nextAP.StartUp();
-                    // Spawn two more projectiles
-                    FireAnotherProjectile(offsetDirectionByAngle(rigidBody.velocity.normalized, 25), rigidBody.transform.position);
-                    FireAnotherProjectile(offsetDirectionByAngle(rigidBody.velocity.normalized, -25), rigidBody.transform.position);
+                    }
                 }
             }
         }
@@ -159,11 +192,11 @@ namespace Complete
 
             //SetLayerOnAll(exampleRigidBody.gameObject, 16);
             //AttackProjectile newAP = exampleRigidbody.gameObject.GetComponent<AttackProjectile>();
-            Rigidbody projectileInstance = Instantiate(rigidBody, transform.position, transform.rotation) as Rigidbody;
+            GameObject projectileInstance = Instantiate(gameObject, transform.position, transform.rotation) as GameObject;
 
             //SetLayerOnAll(newAP.gameObject, 16);
             AttackProjectile newAP = projectileInstance.gameObject.GetComponent<AttackProjectile>();
-            projectileInstance.velocity = shotDirection.normalized * speed;
+            projectileInstance.GetComponent<Rigidbody>().velocity = shotDirection.normalized * speed;
             newAP.hitModifiers.Clear();
             newAP.originalRotation = newAP.transform.rotation;
 
@@ -226,7 +259,8 @@ namespace Complete
 
         }
 
-        private void Bounce() {
+        private void Bounce()
+        {
             if (bounces > 0)
                 bounces -= 1;
             else
@@ -245,10 +279,10 @@ namespace Complete
         {
             foreach (AttackModifier nextAM in hitModifiers)
             {
-                    if (nextAM.is_enabled && nextAM.type == "chain_shot")
-                    {
-                        FireAnotherProjectileChain(transform.forward, enemy.parentTransform.position);
-                    }
+                if (nextAM.is_enabled && nextAM.type == "chain_shot")
+                {
+                    FireAnotherProjectileChain(transform.forward, enemy.parentTransform.position);
+                }
             }
         }
         private float TimeOfDeath = 1f;

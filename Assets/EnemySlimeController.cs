@@ -6,44 +6,25 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityScript.Steps;
 
-public class EnemySlimeController : MonoBehaviour, IEnemyController
+public class EnemySlimeController : EnemyController
 {
-    private Transform colliderTransform;
-    private Animator anim;
-    private GameObject enemySprite;
-    private NavMeshAgent navMeshAgent;
-    private Transform player;
-    private float bulletVelocity = 7f;
-    private int numberOfBullets = 6;
     private Transform circle;
-    private List<GameObject> axeBullets = new List<GameObject>();
     private Vector3 circleOriginalScale;
     private float circleScale = 0;
     private SpriteRenderer renderer;
     private float explosionRadius = 2.4f;
     private int explosionDamage = 1;
-    private bool finalDeath = false;
-    private float health = 30f;
     private bool explosionStarted = false;
-    // Start is called before the first frame update
-    void Start()
+
+    public override void onStart()
     {
-        player = GameObject.Find("Player").transform;
+        health = 30f;
+        bulletVelocity = 9f;
         circle = transform.Find("CircleParent").Find("Circle");
-
         circleOriginalScale = circle.localScale;
-
         circle.localScale = circleOriginalScale * circleScale;
-        navMeshAgent = gameObject.GetComponent<NavMeshAgent>();
-        anim = transform.Find("Anim").GetComponent<Animator>();
         renderer = transform.Find("Anim").GetComponent<SpriteRenderer>();
-        colliderTransform = transform.Find("Collider");
-        initialRotation = transform.rotation;
-
-        //SpawnAndFireBullets();
-
     }
-
     // Update is called once per frame
     void Update()
     {
@@ -123,7 +104,7 @@ public class EnemySlimeController : MonoBehaviour, IEnemyController
             if (Vector3.Distance(player.position, parentTransform.position) < explosionRadius)
             {
                 var playerManager = player.GetComponent<PlayerManager>();
-                playerManager.Damage(1, "blunt");
+                playerManager.Damage(explosionDamage, "blunt");
             }
             simpleBool = true;
             anim.gameObject.SetActive(false);
@@ -143,7 +124,7 @@ public class EnemySlimeController : MonoBehaviour, IEnemyController
         navMeshAgent.SetDestination(player.transform.position);
     }
 
-    protected void Death()
+    public override void Death()
     {
         finalDeath = true;
         //anim.SetInteger("State", 5);
@@ -158,20 +139,14 @@ public class EnemySlimeController : MonoBehaviour, IEnemyController
         yield return null;
     }
 
-    public void HitByProjectile(AttackProjectile projectile)
-    {
+    public override void ApplyProjectile(AttackProjectile projectile) {
         if (!explosionStarted)
             health -= projectile.damage;
-        if (health < 0) {
+        if (health < 0)
+        {
             anim.SetBool("Explode", true);
             Death();
         }
     }
 
-    public Transform parentTransform => transform;
-
-    public void addDebuff(AttackModifier attackModifier)
-    {
-        throw new NotImplementedException();
-    }
 }

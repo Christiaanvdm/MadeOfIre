@@ -11,7 +11,7 @@
       "skill_name": "",
       "description": "Short Teleport",
       "skill_sprite_name": "Blink",
-      "cooldown":  "1.5"
+      "cooldown": "1.5"
     },
     {
       "requiresTarget": "None",
@@ -76,6 +76,19 @@
       "skill_name": "",
       "description": "Size",
       "skill_sprite_name": "Size",
+      "cooldown": "1.5"
+    },
+    {
+      "requiresTarget": "None",
+      "duration": 4.0,
+      "magnitude": 1,
+      "type": "bounce",
+      "projectileSpeed": 10.0,
+      "projectileSize": 1.0,
+      "projectileDamage": 0.0,
+      "skill_name": "",
+      "description": "Bounce",
+      "skill_sprite_name": "Bounce",
       "cooldown": "1.5"
     }
   ]

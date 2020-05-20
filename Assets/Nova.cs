@@ -14,7 +14,7 @@ namespace Complete {
         // Start is called before the first frame update
         void Start()
         {
-         
+
             StartCoroutine("expandWave");
             stepSize = minSize = maxSize / iterations;
             transform.localScale = new Vector3(stepSize, 1, stepSize);
@@ -43,26 +43,19 @@ namespace Complete {
         // Update is called once per frame
         void Update()
         {
-
-
-
         }
-
-      
-
-
 
         private void OnTriggerEnter(Collider other)
         {
             if (other.tag == "enemy")
             {
-                EnemySpriteManager enemySpriteManager = other.gameObject.GetComponent<EnemySpriteManager>();
-                AttackModifier newAM = new AttackModifier();
+                IEnemyController enemy = other.gameObject.GetComponentInParent<IEnemyController>();
+                AttackModifierBasic newAM = new AttackModifierBasic();
                 newAM.type = "half_speed";
                 newAM.duration = NovaEffectDuration;
                 newAM.context = "debuff";
                 newAM.magnitude = magnitude;
-                enemySpriteManager.enemy.addDebuff(newAM);
+                enemy.addDebuff(newAM);
             }
 
         }

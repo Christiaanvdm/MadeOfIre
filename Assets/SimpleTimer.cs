@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 
@@ -17,10 +18,11 @@ namespace Complete
         public string icon_name;
 
         public CombatManager creator;
-        public EnemyManager2D enemy;
+        public IEnemyController enemy;
         public float targetTime = 60.0f;
-        private Object parent;
+
         public bool start = false;
+
         public AttackModifier attack_modifier;
         private float endTime;
         private bool cooldownStart = false;
@@ -30,7 +32,7 @@ namespace Complete
         public bool is_enabled = true;
         public string context;
 
-      
+
         private void Start()
         {
 
@@ -44,34 +46,31 @@ namespace Complete
 
 
         }
-        public void startTimer(AttackModifier attackModifier, EnemyManager2D new_enemy = null, CombatManager owner = null)
+        public void startTimer(AttackModifier attackModifier, IEnemyController new_enemy = null, CombatManager owner = null)
         {
-          
-            if (!start)
-            {
-               
-                endTime = Time.time + attackModifier.duration;
-                attack_modifier = attackModifier;
-                if (owner)
-                {
-                    creator = owner;
-                    imageCooldown = skillCooldownClone.GetComponent<Image>();
-                }
-                else if (new_enemy)
-                {
-                    enemy = new_enemy;
-                }
-                start = true;
-                cooldownStart = true;
-            }
+            if (start)
+                throw new Exception("Start Timer called twice");
 
+            endTime = Time.time + attackModifier.duration;
+            attack_modifier = attackModifier;
+            if (owner)
+            {
+                creator = owner;
+                imageCooldown = skillCooldownClone.GetComponent<Image>();
+            }
+            else if (new_enemy != null)
+            {
+                enemy = new_enemy;
+            }
+            start = true;
+            cooldownStart = true;
         }
-    
+
         private void EnsureDeath()
         {
 
         }
-            
+
 
 
 
@@ -109,15 +108,15 @@ namespace Complete
             {
                 creator.removeSkillModifier(attack_modifier);
             }
-            else if ((attack_modifier.type == "half_speed") && (enemy))
+            else if ((attack_modifier.type == "half_speed") && (enemy != null))
             {
-                enemy.removeDebuff(attack_modifier);
+                enemy.removeDebuff(attack_modifier.CreateAttackModifierBasic());
             }
             else if ((attack_modifier.type == "half_speed") && (creator))
             {
                 creator.removeAttackModifier(attack_modifier);
             }
-            else  
+            else
             {
                 creator.removeAttackModifier(attack_modifier);
             }

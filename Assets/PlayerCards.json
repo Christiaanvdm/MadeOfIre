@@ -2,15 +2,15 @@
   "current_deck": [
     {
       "requiresTarget": "None",
-      "duration": 2.0,
-      "magnitude": 3.0,
-      "type": "double_size",
+      "duration": 4.0,
+      "magnitude": 2,
+      "type": "half_speed",
       "projectileSpeed": 10.0,
       "projectileSize": 1.0,
       "projectileDamage": 0.0,
       "skill_name": "",
-      "description": "Size",
-      "skill_sprite_name": "Size",
+      "description": "Half Speed",
+      "skill_sprite_name": "HalfSpeed",
       "cooldown": "1.5"
     },
     {
@@ -28,15 +28,15 @@
     },
     {
       "requiresTarget": "None",
-      "duration": 2.0,
-      "magnitude": 3.0,
-      "type": "double_size",
+      "duration": 4.0,
+      "magnitude": 2,
+      "type": "half_speed",
       "projectileSpeed": 10.0,
       "projectileSize": 1.0,
       "projectileDamage": 0.0,
       "skill_name": "",
-      "description": "Size",
-      "skill_sprite_name": "Size",
+      "description": "Half Speed",
+      "skill_sprite_name": "HalfSpeed",
       "cooldown": "1.5"
     },
     {
@@ -54,17 +54,16 @@
     },
     {
       "requiresTarget": "None",
-      "duration": 5.0,
+      "duration": 4.0,
       "magnitude": 2,
-      "type": "spawn_glacier",
+      "type": "split_shot",
       "projectileSpeed": 10.0,
       "projectileSize": 1.0,
       "projectileDamage": 0.0,
       "skill_name": "",
-      "description": "Create Glacier",
-      "skill_sprite_name": "SpawnGlacier",
+      "description": "Split Shot",
+      "skill_sprite_name": "SplitShot",
       "cooldown": "1.5"
     }
-
   ]
 }

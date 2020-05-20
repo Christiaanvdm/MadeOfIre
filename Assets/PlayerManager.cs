@@ -323,7 +323,7 @@ namespace Complete
 
                     if (enemyAP)
                     {
-                        Damage(1, "blunt");
+                        Damage(enemyAP.damage, "blunt");
                     }
             }
             if (colliderGO.tag == "enemy")
@@ -497,19 +497,23 @@ namespace Complete
 
         public void LoadPlayerCards()
         {
-            //string path = "Assets/PlayerCards.json";
-            //StreamReader reader = new StreamReader(path);
-            //string readerString = reader.ReadToEnd();
 
-            //reader.Close();
-            string readerString = playerCards.text;
+            string readerString = "";
+            if (!PlayerPrefs.HasKey("Cards"))
+            {
+                readerString = playerCards.text;
+                PlayerPrefs.SetString("Cards", readerString);
+            }
+            else {
+                readerString = PlayerPrefs.GetString("Cards");
+            }
+
             current_deck.Clear();
             PlayerState playerState = JsonUtility.FromJson<PlayerState>(readerString);
             current_deck = playerState.current_deck;
             draw_pile = current_deck.OrderBy(x => Random.value).ToList();
             StartCoroutine("slightlyAfterStart");
             discard_pile.Clear();
-
         }
 
         IEnumerator slightlyAfterStart()
@@ -522,9 +526,6 @@ namespace Complete
             }
             yield return null;
         }
-
-
-
 
         public void DrawCard(string cardIdentifier, bool AddToDiscardPile = true)
         {
@@ -567,14 +568,24 @@ namespace Complete
 
         public void SavePlayerCards()
         {
-            //PlayerState playerState = new PlayerState();
-            //SkillDetail newSkillDetail = new SkillDetail();
-            //newSkillDetail.description = "Some description";
-            //playerState.current_deck = current_deck;
-            //string path = "PlayerCards.json";
-            //StreamWriter writer = new StreamWriter(path, true);
-            //writer.Write(JsonUtility.ToJson(playerState));
-            //writer.Close();
+            PlayerState playerState = new PlayerState();
+            SkillDetail newSkillDetail = new SkillDetail();
+            newSkillDetail.description = "Some description";
+            playerState.current_deck = current_deck;
+            PlayerPrefs.SetString("Cards", JsonUtility.ToJson(playerState));
+        }
+
+
+        public void SavePlayerCardsToFile()
+        {
+            PlayerState playerState = new PlayerState();
+            SkillDetail newSkillDetail = new SkillDetail();
+            newSkillDetail.description = "Some description";
+            playerState.current_deck = current_deck;
+            string path = "PlayerCards.json";
+            StreamWriter writer = new StreamWriter(path, true);
+            writer.Write(JsonUtility.ToJson(playerState));
+            writer.Close();
         }
 
         public void DiscardHand()

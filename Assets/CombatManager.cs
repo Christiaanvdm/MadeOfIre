@@ -51,13 +51,11 @@ namespace Complete
         private DeathScreen deathScreen;
 
         public string currentRoom = "StartRoom";
-
-        Quaternion initialOrientation;
         // Start is called before the first frame update
         void Start()
         {
-            if (StaticCombatLevel.currentRoom == null)
-                StaticCombatLevel.currentRoom = "StartRoom";
+            if (!PlayerPrefs.HasKey("CurrentRoom"))
+                PlayerPrefs.SetString("CurrentRoom", "StartRoom");
             deathScreen = Resources.FindObjectsOfTypeAll<DeathScreen>()[0];
             deathScreen.gameObject.SetActive(false);
             DeckManagerGO = Resources.FindObjectsOfTypeAll<DeckManager>()[0].gameObject;
@@ -75,13 +73,12 @@ namespace Complete
             deckManager = DeckManagerGO.GetComponent<DeckManager>();
             UpdateHUDHealth(6);
             SpawnRoom();
-
-
         }
 
         public void SpawnRoom()
         {
-            var room = Resources.Load<GameObject>($"Rooms/{StaticCombatLevel.currentRoom}");
+            var currentRoom = PlayerPrefs.GetString("CurrentRoom");
+            var room = Resources.Load<GameObject>($"Rooms/{currentRoom}");
 
             GameObject newRoom = Instantiate(room) as GameObject;
             var entrance = transform.Find("Exit");
@@ -426,12 +423,12 @@ namespace Complete
             inMenu = true;
         }
 
-        public void EnterMenu(SkillDetail newCard, PodiumManager podium)
+        public void EnterMenu(SkillDetail newCard)
         {
             PauseGame();
             DeckManagerGO.SetActive(true);
             inMenu = true;
-            deckManager.AddCardMenu(newCard, podium);
+            deckManager.AddCardMenu(newCard);
         }
 
         public void Death()
@@ -622,10 +619,10 @@ namespace Complete
             //newAM.skillCooldownClone.gameObject.transform.SetPositionAndRotation(new Vector3(11, -277, 0),
             //newAM.skillCooldownClone.gameObject.transform.rotation);
             newAM.skillCooldownClone.gameObject.transform.SetPositionAndRotation(new Vector3(
-                newAM.skillCooldownClone.gameObject.transform.position.x + (thisAMCount * iconWidth),
-                newAM.skillCooldownClone.gameObject.transform.position.y + 135,
-                newAM.skillCooldownClone.gameObject.transform.position.z),
-                newAM.skillCooldownClone.gameObject.transform.rotation);
+            newAM.skillCooldownClone.gameObject.transform.position.x + (thisAMCount * iconWidth),
+            newAM.skillCooldownClone.gameObject.transform.position.y + 135,
+            newAM.skillCooldownClone.gameObject.transform.position.z),
+            newAM.skillCooldownClone.gameObject.transform.rotation);
 
             if (SkillModifierList.Count > 0)
             {
@@ -839,10 +836,4 @@ namespace Complete
         }
 
     }
-
-    public static class StaticCombatLevel {
-        public static string currentRoom { get; set; }
-    }
-
-
 }

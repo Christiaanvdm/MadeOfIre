@@ -4,6 +4,21 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace Complete
 {
+
+    public static class SkillTypes
+    {
+        public const string Damage = "double_damage";
+        public const string Size = "double_size";
+        public const string Blink = "blink";
+        public const string Glacier = "spawn_glacier";
+        public const string SplitShot = "split_shot";
+        public const string Slow = "half_speed";
+        public const string Duration = "double_duration";
+        public const string Bounce = "bounce";
+        public const string DodgeRoll = "dodge_roll";
+        public const string Chain = "chain_shot";
+    }
+
     [System.Serializable]
     public class PlayerState
     {
@@ -54,10 +69,9 @@ namespace Complete
         private CombatManager combatManager;
         private Renderer beamRenderer;
         private GameObject beam;
-        private GameObject Projectile;
 
 
-        private Rigidbody projectileRigidbody;
+        //private Rigidbody projectileRigidbody;
         private Transform originTransform;           // Where the projectile is spawned.
         public string requiresTarget = "None";
         private CardManager cardManager;
@@ -75,8 +89,7 @@ namespace Complete
             player = GameObject.Find("Player");
             playerManager = player.GetComponent<PlayerManager>();
             beam = GameObject.Find("BeamAttack");
-            Projectile = GameObject.Find("AttackProjectile");
-            projectileRigidbody = Projectile.gameObject.GetComponent<Rigidbody>();
+
             originTransform = player.transform;
             MainCanvas = GameObject.Find("HUDUICanvas");
             blinkAnim = blinkAnimation.GetComponent<Animator>();
@@ -92,10 +105,11 @@ namespace Complete
         {
 
             Vector3 shotDirection = (FindMousePointRelativeToPlayer() - player.transform.position).normalized;
+            var projectileRigidbody = Resources.Load<Rigidbody>("AttackProjectile");
             Rigidbody projectileInstance = Instantiate(projectileRigidbody, originTransform.position + new Vector3(0, 0.1f, -0.2f), originTransform.rotation) as Rigidbody;
             projectileInstance.velocity = shotDirection * projectileSpeed;
             cardManager.cooldown = 1.5f;
-            projectileInstance.transform.up = new Vector3(0, 1, 0);
+            //projectileInstance.transform.up = new Vector3(0, 1, 0);
             AttackProjectile nextAP = projectileInstance.GetComponent<AttackProjectile>();
             nextAP.speed = projectileSpeed;
             combatManager.ModifyProjectile(ref nextAP);
@@ -180,51 +194,49 @@ namespace Complete
                 {
                     first_beam = true;
                     BeamAttack();
-
                 }
             }
         }
 
         private void SkillsTargetNone()
         {
-            if (type == "dodge_roll")
+            if (type == SkillTypes.DodgeRoll)
             {
                 DodgeRoll(true);
             }
-            else if (type == "double_size")
+            else if (type == SkillTypes.Size)
             {
                 DoubleSize();
             }
-            else if (type == "double_damage")
+            else if (type == SkillTypes.Damage)
             {
                 DoubleDamage();
             }
-            else if (type == "double_duration")
+            else if (type == SkillTypes.Duration)
             {
                 DoubleDuration();
             }
-            else if (type == "half_speed")
+            else if (type == SkillTypes.Slow)
             {
                 EnemyHalfSpeed();
             }
-            else if (type == "split_shot")
+            else if (type == SkillTypes.SplitShot)
             {
                 SplitShot();
             }
-            else if (type == "chain_shot")
+            else if (type == SkillTypes.Chain)
             {
                 ChainShot();
             }
-            else if (type == "spawn_glacier")
+            else if (type == SkillTypes.Glacier)
             {
                 SpawnGlacier();
             }
-            else if (type == "blink")
+            else if (type == SkillTypes.Blink)
             {
-
                 Blink();
             }
-            else if (type == "bounce") {
+            else if (type == SkillTypes.Bounce) {
                 Bounce();
             }
         }
@@ -338,7 +350,7 @@ namespace Complete
 
         private void CreateNova()
         {
-            GameObject newNova = Instantiate(Resources.Load("Nova")) as GameObject;
+            //GameObject newNova = Instantiate(Resources.Load("Nova")) as GameObject;
         }
 
 

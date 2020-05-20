@@ -7,32 +7,14 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Video;
 
-public class EnemyZombieController : MonoBehaviour, IEnemyController
+public class EnemyZombieController : EnemyController
 {
-    private Transform colliderTransform;
-    private Animator anim;
-    private Transform enemySprite;
-    private NavMeshAgent navMeshAgent;
-    private Transform player;
-    private float bulletVelocity = 9f;
-    private int numberOfBullets = 30;
-    private float health = 20f;
 
     private List<GameObject> axeBullets = new List<GameObject>();
 
-    private bool finalDeath = false;
-
-    public Transform parentTransform => transform;
-    // Start is called before the first frame update
-    void Start()
-    {
-        player = GameObject.Find("Player").transform;
-        enemySprite = transform.Find("Anim");
-        navMeshAgent = gameObject.GetComponent<NavMeshAgent>();
-        anim = transform.Find("Anim").GetComponent<Animator>();
-        colliderTransform = transform.Find("Collider");
-        initialRotation = transform.rotation;
-        //SpawnAndFireBullets();
+    public override void onStart() {
+        bulletVelocity = 9f;
+        health = 200f;
         StartCoroutine(AttackEnemy());
         anim.SetBool("Moving", true);
     }
@@ -87,26 +69,6 @@ public class EnemyZombieController : MonoBehaviour, IEnemyController
         }
     }
 
-    private void SpawnAndFireBulletsCircle()
-    {
-        var fireTrajectory = (colliderTransform.position - player.position).normalized;
-        int intervals = numberOfBullets;
-        float radius = 2;
-        Vector3 currentPos = new Vector3(colliderTransform.position.x, 1.2f, colliderTransform.position.z);
-        var projectilePrefab = Resources.Load<GameObject>("EnemyProjectile");
-        float degrees = (360f / intervals) * (Mathf.PI / 180);
-        float currentDegree = -45 * (Mathf.PI / 180);
-        for (int i = 0; i < intervals; i++)
-        {
-
-            Vector3 offset = new Vector3(Mathf.Cos(currentDegree) * radius, 0, Mathf.Sin(currentDegree) * radius);
-            var nextBullet = Instantiate(projectilePrefab, currentPos + offset, transform.rotation);
-            fireTrajectory = offset.normalized;
-            currentDegree += degrees;
-            nextBullet.GetComponent<Rigidbody>().velocity += fireTrajectory * bulletVelocity;
-        }
-    }
-
     private bool EnemyLineOfSight()
     {
         RaycastHit[] raycastHits;
@@ -123,7 +85,6 @@ public class EnemyZombieController : MonoBehaviour, IEnemyController
         return canSeeEnemy;
     }
 
-    private Quaternion initialRotation;
 
     private void MoveTowardsEnemy()
     {
@@ -138,7 +99,7 @@ public class EnemyZombieController : MonoBehaviour, IEnemyController
     }
 
     private float distanceToKeep = 4f;
-    public void Death()
+    public override void Death()
     {
         transform.GetComponent<NavMeshAgent>().speed = 0f;
         colliderTransform.gameObject.SetActive(false);
@@ -153,21 +114,6 @@ public class EnemyZombieController : MonoBehaviour, IEnemyController
         yield return new WaitForSeconds(2f);
         gameObject.SetActive(false);
         yield return null;
-    }
-
-    public void HitByProjectile(AttackProjectile projectile)
-    {
-        health -= projectile.damage;
-        if (health < 0)
-        {
-            Death();
-        }
-    }
-
-
-    public void addDebuff(AttackModifier attackModifier)
-    {
-        throw new NotImplementedException();
     }
 
     void LookAtPlayer()

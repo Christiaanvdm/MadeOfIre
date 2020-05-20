@@ -188,7 +188,7 @@ namespace Complete {
 
 
 
-        public void AddCardMenu(SkillDetail newCard, PodiumManager podium)
+        public void AddCardMenu(SkillDetail newCard)
         {
             var newCardSprite = Resources.Load<Sprite>("ActiveCard" + newCard.skill_sprite_name);
             newCardImage.sprite = newCardSprite;

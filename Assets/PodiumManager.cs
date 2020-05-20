@@ -47,8 +47,8 @@ namespace Complete
                 rewardCard = getRandomSkillDetailFromAllCards();
                 var newCardImage = Resources.Load<Sprite>("ActiveCard" + rewardCard.skill_sprite_name);
                 card.GetComponentInChildren<SpriteRenderer>().sprite = newCardImage;
+                card.GetComponent<PodiumCard>().skillDetail = rewardCard;
             }
-
         }
 
         // Update is called once per frame
@@ -85,17 +85,15 @@ namespace Complete
             }
         }
 
-        void OnMouseDown()
-        {
 
+
+        public void ShowAddCards(SkillDetail skillDetail) {
             if (isActive)
             {
-
                 // Show add card menu
                 deckManager.ShowAddCards(this);
-                combatManager.EnterMenu(rewardCard, this);
+                combatManager.EnterMenu(skillDetail);
             }
-
         }
 
         private void OnMouseOver()
@@ -113,9 +111,9 @@ namespace Complete
 
         private void EnlargeRewards()
         {
-            foreach (var card in cards) {
-                card.transform.localScale = originalScale * cardScale;
-            }
+            //foreach (var card in cards) {
+            //    card.transform.localScale = originalScale * cardScale;
+            //}
 
             anim.SetBool("Highlight", true);
             turnLightOn();
@@ -123,10 +121,10 @@ namespace Complete
 
         private void ShrinkReward()
         {
-            foreach (var card in cards)
-            {
-                card.transform.localScale = originalScale * (1 / cardScale);
-            }
+            //foreach (var card in cards)
+            //{
+            //    card.transform.localScale = originalScale * (1 / cardScale);
+            //}
 
             anim.SetBool("Highlight", false);
             turnLightOff();
@@ -157,7 +155,9 @@ namespace Complete
         public void DisablePodium()
         {
             isActive = false;
-            //card.SetActive(false);
+            foreach (var card in cards) {
+                card.SetActive(false);
+            }
         }
     }
 }

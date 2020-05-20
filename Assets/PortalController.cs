@@ -56,6 +56,7 @@ namespace Complete {
                 yield return new WaitForSeconds(0.5f);
                 startTeleport = false;
                 playerManager.ControlsDisabled = false;
+                playerManager.SavePlayerCards();
             }
             yield return null;
         }

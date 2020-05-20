@@ -6,28 +6,14 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Video;
 
-public class EnemyAxeController : MonoBehaviour, IEnemyController
+public class EnemyAxeController : EnemyController
 {
-    private Transform colliderTransform;
-    private Animator anim;
-    private Transform enemySprite;
-    private NavMeshAgent navMeshAgent;
-    private Transform player;
-    private float bulletVelocity = 9f;
     private int numberOfBullets = 30;
-    private float health = 20f;
-    private Quaternion initialRotation;
-    private bool finalDeath = false;
-    // Start is called before the first frame update
-    void Start()
+
+    public override void onStart()
     {
-        player = GameObject.Find("Player").transform;
-        enemySprite = transform.Find("Anim");
-        navMeshAgent = gameObject.GetComponent<NavMeshAgent>();
-        anim = transform.Find("Anim").GetComponent<Animator>();
-        colliderTransform = transform.Find("Collider");
-        initialRotation = transform.rotation;
-        //SpawnAndFireBullets();
+        bulletVelocity = 9f;
+        health = 20f;
         StartCoroutine(AttackEnemy());
     }
 
@@ -100,7 +86,7 @@ public class EnemyAxeController : MonoBehaviour, IEnemyController
         navMeshAgent.SetDestination(player.transform.position);
     }
 
-    protected void Death()
+    public override void Death()
     {
         transform.GetComponent<NavMeshAgent>().speed = 0f;
         finalDeath = true;
@@ -109,19 +95,5 @@ public class EnemyAxeController : MonoBehaviour, IEnemyController
         enemySprite.transform.position = new Vector3(transform.position.x, 0.405f, transform.position.z);
     }
 
-    public void HitByProjectile(AttackProjectile projectile)
-    {
-        health -= projectile.damage;
-        if (health < 0)
-        {
-            Death();
-        }
-    }
-
     public Transform parentTransform => transform;
-
-    public void addDebuff(AttackModifier attackModifier)
-    {
-        throw new NotImplementedException();
-    }
 }
