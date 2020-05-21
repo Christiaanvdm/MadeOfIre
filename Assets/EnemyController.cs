@@ -86,6 +86,9 @@ namespace Complete
                 bool first = true;
                 foreach (var item in group)
                 {
+                    if (item == null)
+                        continue;
+
                     if (first)
                     {
                         nextAm = new AttackModifierBasic();
@@ -117,6 +120,7 @@ namespace Complete
             if (debuff.type == SkillTypes.Slow) {
                 navMeshAgent.speed = navMeshAgent.speed / debuff.magnitude;
             }
+
             debuffList.Add(debuff);
         }
 
@@ -126,6 +130,7 @@ namespace Complete
             {
                 navMeshAgent.speed = navMeshAgent.speed * debuff.magnitude;
             }
+
             debuffList.Remove(debuff);
         }
 

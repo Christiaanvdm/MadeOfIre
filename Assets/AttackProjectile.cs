@@ -97,23 +97,6 @@ namespace Complete
 
         }
 
-        //void Attack(Vector3 shotDirection)
-        //{
-        //    // Generate projectile
-        //    Projectile newProjectile = new Projectile();
-
-        //    Rigidbody projectileInstance = Instantiate(rigidBody, transform.position, transform.rotation) as Rigidbody;
-        //    newProjectile.rigidbody = projectileInstance;
-
-        //    projectileInstance.velocity = shotDirection * speed;
-        //    newProjectile.rigidbody.gameObject.GetComponent<AttackProjectile>().projectile = newProjectile;
-
-        //    projectileInstance.transform.right = -1 * shotDirection;
-        //    combatManager.ModifyProjectile(ref newProjectile);
-        //    newProjectile.StartUp();
-
-        //}
-
         public void StartUp()
         {
             GroupAttackModifiers();
@@ -137,6 +120,8 @@ namespace Complete
                 bool first = true;
                 foreach (var item in group)
                 {
+                    if (item == null)
+                        continue;
                     if (first)
                     {
                         nextAm = new AttackModifier();
@@ -150,8 +135,8 @@ namespace Complete
                 }
                 groupedModifiersList.Add(nextAm);
             }
-            this.birthModifiers = groupedModifiersList;
 
+            this.birthModifiers = groupedModifiersList;
         }
 
         private void Birth()
@@ -227,7 +212,6 @@ namespace Complete
 
             //newAP.birthModifiers.Clear();
             newAP.StartUp();
-
         }
 
         private Vector3 findVelocityDirection()

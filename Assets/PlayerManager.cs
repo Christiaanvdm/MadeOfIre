@@ -550,12 +550,14 @@ namespace Complete
             var InActiveSprite = Resources.Load<Sprite>("InactiveCard" + nextCard.skill_sprite_name);
             spriteActiveCardRenderer.sprite = ActiveSprite;
             spriteInactiveCardRenderer.sprite = InActiveSprite;
+            skillManager.skillDetail = nextCard;
             skillManager.duration = nextCard.duration;
             skillManager.magnitude = nextCard.magnitude;
             skillManager.description = nextCard.description;
             skillManager.type = nextCard.type;
             skillManager.skill_sprite_name = nextCard.skill_sprite_name;
             skillManager.cooldown = nextCard.cooldown;
+            skillManager.requiresTarget = nextCard.requiresTarget;
 
             draw_pile.Remove(nextCard);
         }

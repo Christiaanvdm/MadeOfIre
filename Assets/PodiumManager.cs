@@ -115,7 +115,7 @@ namespace Complete
             //    card.transform.localScale = originalScale * cardScale;
             //}
 
-            anim.SetBool("Highlight", true);
+            //anim.SetBool("Highlight", true);
             turnLightOn();
         }
 
@@ -126,7 +126,7 @@ namespace Complete
             //    card.transform.localScale = originalScale * (1 / cardScale);
             //}
 
-            anim.SetBool("Highlight", false);
+            //anim.SetBool("Highlight", false);
             turnLightOff();
         }
 

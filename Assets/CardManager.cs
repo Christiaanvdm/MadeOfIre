@@ -13,12 +13,12 @@ namespace Complete {
         private SkillManager skillManager;
         private SkillManager_Attack skillManager_Attack;
         private CombatManager combatManager;
-        public int cardType;                                        
+        public int cardType;
 
         private Vector3 initialPosition;
         private Quaternion initialRotation;
         private Rigidbody rigidBody;
-   
+
         public Vector3 screenPoint;
         public Vector3 offset;
         private EnemyManager enemyManager;
@@ -53,7 +53,7 @@ namespace Complete {
             }
 
             canvasCardsGameObject = GameObject.Find("HUDUICanvasCards");
-            
+
             try
             {
                 canvasCardGO = canvasCardsGameObject.transform.Find(this.gameObject.name + "CanvasCard").gameObject;
@@ -78,26 +78,26 @@ namespace Complete {
             initialRotation = transform.localRotation;
             SnapToAttention();
 
-                                                        
+
 
         }
 
         // Update is called once per frame
         void Update()
         {
-        
+
             //CheckIfEnemyHit();
             if (isDraggingThisCard)
             {
                 onDraggingThisCard();
             }
-           
+
 
         }
 
         private float cooldownScale = 1;
 
-        private void CooldownCard() 
+        private void CooldownCard()
         {
             if (cooldownTransform != null)
             {
@@ -107,7 +107,7 @@ namespace Complete {
                 var cooldownFactor = cooldownScale;
 
                 cooldownTransform.localScale = new Vector3(initialCooldownScale.x, initialCooldownScale.y * cooldownScale, initialCooldownScale.z   );
-            }  
+            }
         }
 
         private void FixedUpdate()
@@ -117,7 +117,7 @@ namespace Complete {
                 if (!this.IsActive())
                 {
                     CooldownCard();
-                    
+
                 }
                 if (Time.time > discardTime)
                 {
@@ -147,7 +147,7 @@ namespace Complete {
             isActive = false;
             SnapToAttention();
             discardTime = Time.time + skillManager.cooldown;
-            
+
             //gameObject.transform.Find("CardBase").gameObject.GetComponent<Renderer>().enabled = false;
             gameObject.transform.Find("Sprite").gameObject.GetComponent<Renderer>().enabled = false;
         }
@@ -158,7 +158,7 @@ namespace Complete {
             offset = new Vector3(-0.4f, -0.3f, -0.4f);
             //screenPoint = Camera.main.WorldToScreenPoint(gameObject.transform.position);
         }
-       
+
         private bool mouse_is_over;
         private bool mouse_is_over_enemy;
         private bool tick_tock;
@@ -192,7 +192,7 @@ namespace Complete {
         }
         Vector3 start_pos;
         private Vector3 cardPositionBeforeDrag;
-       
+
          public void OnMouseDown()
         {
             if (isActive)
@@ -215,7 +215,7 @@ namespace Complete {
 
         private void onDraggingThisCard()
         {
-            if (isActive) { 
+            if (isActive) {
 
                 transform.localScale = initialScale * scaleMultiplier;
                 //transform.localScale = initialScale * scaleMultiplier;
@@ -229,7 +229,7 @@ namespace Complete {
 
         private bool mouse_is_over_card = false;
 
-   
+
         public void OnMouseUp()
         {
             if (isActive)
@@ -238,14 +238,14 @@ namespace Complete {
                 {
                     skillManager = gameObject.GetComponent<SkillManager>();
                 }
-                skillManager.SkillWithoutEnemy();
+                skillManager.ExecuteSkill();
                 gameObject.transform.localPosition = cardPositionBeforeDrag;
                 isDraggingThisCard = false;
-                if (combatManager) { 
+                if (combatManager) {
                     combatManager.isDraggingACard = false;
                 }
 
-                
+
 
                 transform.localScale = initialScale;
                 offset = initialOffset;
@@ -280,9 +280,9 @@ namespace Complete {
 
         private void startDrawCard()
         {
-            
+
         }
     }
 
-   
+
 }

@@ -115,6 +115,7 @@
     <Compile Include="Assets\SimpleTimer.cs" />
     <Compile Include="Assets\SkillManager.cs" />
     <Compile Include="Assets\SkillManager_Attack.cs" />
+    <Compile Include="Assets\Skills\SkillDetail.cs" />
     <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Demigiant\DOTween\Modules\DOTweenModuleAudio.cs" />
     <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Demigiant\DOTween\Modules\DOTweenModulePhysics.cs" />
     <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Demigiant\DOTween\Modules\DOTweenModulePhysics2D.cs" />

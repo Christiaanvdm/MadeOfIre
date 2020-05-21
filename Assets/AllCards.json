@@ -1,7 +1,7 @@
 {
   "current_deck": [
     {
-      "requiresTarget": "None",
+      "requiresTarget": "ground",
       "duration": 5.0,
       "magnitude": 30,
       "type": "blink",
@@ -14,7 +14,7 @@
       "cooldown": "1.5"
     },
     {
-      "requiresTarget": "None",
+      "requiresTarget": "ground",
       "duration": 5.0,
       "magnitude": 2,
       "type": "spawn_glacier",
@@ -27,7 +27,7 @@
       "cooldown": "1.5"
     },
     {
-      "requiresTarget": "None",
+      "requiresTarget": "attack",
       "duration": 4.0,
       "magnitude": 2,
       "type": "split_shot",
@@ -40,7 +40,7 @@
       "cooldown": "1.5"
     },
     {
-      "requiresTarget": "None",
+      "requiresTarget": "attack",
       "duration": 4.0,
       "magnitude": 0.5,
       "type": "half_speed",
@@ -53,7 +53,7 @@
       "cooldown": "1.5"
     },
     {
-      "requiresTarget": "None",
+      "requiresTarget": "skill",
       "duration": 2.0,
       "magnitude": 2.0,
       "type": "double_duration",
@@ -66,7 +66,7 @@
       "cooldown": "1.5"
     },
     {
-      "requiresTarget": "None",
+      "requiresTarget": "attack",
       "duration": 2.0,
       "magnitude": 3.0,
       "type": "double_size",
@@ -79,7 +79,7 @@
       "cooldown": "1.5"
     },
     {
-      "requiresTarget": "None",
+      "requiresTarget": "attack",
       "duration": 4.0,
       "magnitude": 1,
       "type": "bounce",
