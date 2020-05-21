@@ -1,36 +1,84 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
-namespace Complete {
+namespace Complete
+{
     public class RoomManager : MonoBehaviour
     {
 
         public List<Transform> spawnPoints;
-        private GameObject enemySample;
-        private GameObject enemySampleA;
-        private GameObject enemySampleBA;
+        public List<Transform> exits;
+        private Transform entrance;
         public List<GameObject> roomEnemies = new List<GameObject>();
         public List<DoorManager> doors = new List<DoorManager>();
         public int enemyCount;
         private PlayerManager playerManager;
         private GameObject rewardPodium;
         private int roomState = 0; //0 - New ; 1 - Enemies spawned ; 2 - Room cleared
-        private GameObject LightComplete;
+        public int mazeDepth;
+        private int extraSpawnPoints = 0;
+        private int maxDepth = 30;
+        private List<GameObject> enemiesPhase1;
 
-        private int extraSpawnPoints = 5; 
-       
-         void Start()
+        private List<GameObject> enemiesPhase2;
+
+        private List<GameObject> enemiesPhase3;
+
+        void Start()
         {
-            LightComplete = GameObject.Find("LightComplete");
-            LightComplete.SetActive(false);
-            rewardPodium = transform.Find("Podium").gameObject;
-            enemySample = Resources.Load("Enemy", typeof(GameObject)) as GameObject;
-            enemySampleA = Resources.Load("EnemyA", typeof(GameObject)) as GameObject;
-            enemySampleBA = Resources.Load("EnemyBA", typeof(GameObject)) as GameObject;
-            playerManager = GameObject.Find("Player").GetComponent<PlayerManager>();
-            rewardPodium.SetActive(false);
-            
+            entrance = transform.Find("Entrance");
+            enemiesPhase1 = FindObjectsOfType<GameObject>().Where(x => x.tag == "enemy").ToList();
+            //rewardPodium = transform.Find("Podium").gameObject;
+            playerManager = FindObjectOfType<PlayerManager>();
+            //rewardPodium.SetActive(false);
+            enemiesPhase1.ForEach(x => x.SetActive(false));
+        }
+
+        void SetupPhases() {
+
+        }
+
+        public void InitializeMap(int _mazeDepth)
+        {
+            mazeDepth = _mazeDepth;
+            mazeDepth += 1;
+            if (mazeDepth > maxDepth)
+                return;
+            SpawnHallways(mazeDepth);
+        }
+
+
+
+        public void SpawnRoom(int mazeDepth)
+        {
+            var rooms = Resources.LoadAll<GameObject>("Rooms/South");
+            var room = rooms.First(x => x.name == "ARoom2");
+            GameObject newRoom = Instantiate(room) as GameObject;
+            var entrance = transform.parent.Find("ExitN");
+
+            newRoom.transform.position = entrance.position + (newRoom.transform.position - newRoom.transform.Find("Entrance").position);
+            newRoom.transform.Find("RoomArea").GetComponent<RoomManager>().InitializeMap(mazeDepth);
+        }
+
+        public void SpawnHallways(int mazeDepth)
+        {
+            foreach (Transform exit in exits)
+            {
+                SpawnHallway(exit);
+            }
+
+        }
+
+        public void SpawnHallway(Transform exit)
+        {
+            var rooms = Resources.LoadAll<GameObject>("Hallways/North");
+            var room = rooms.First(x => x.name == "Straight");
+            GameObject newRoom = Instantiate(room) as GameObject;
+
+            newRoom.transform.position = exit.position + (newRoom.transform.position - newRoom.transform.Find("Entrance").position);
+            //newRoom.GetComponent<ConnectorInit>().SpawnRoom(mazeDepth);
         }
 
 
@@ -48,12 +96,12 @@ namespace Complete {
                 while (!pointIsValid && countOut < 1000)
                 {
                     countOut++;
-                    var randomPoint = new Vector3(Random.Range(transformMin.position.x, transformMax.position.x), 1.2f, Random.Range(transformMin.position.z, transformMax.position.z));
+                    var randomPoint = new Vector3(Random.Range(transformMin.position.x, transformMax.position.x), 0.4f, Random.Range(transformMin.position.z, transformMax.position.z));
                     var overlaps = Physics.OverlapSphere(randomPoint, 1f);
                     if (overlaps.Length == 2)
                     {
                         var newSpawn = new GameObject();
-                        
+
                         newSpawn.transform.position = randomPoint;
                         spawnPoints.Add(newSpawn.transform);
 
@@ -64,7 +112,7 @@ namespace Complete {
 
             }
         }
-        
+
 
         // Update is called once per frame
         void Update()
@@ -74,41 +122,20 @@ namespace Complete {
 
         private void FixedUpdate()
         {
-            if ((roomState != 0) && (enemyCount == 0)) {
-                OpenDoors();
-                rewardPodium.SetActive(true);
-            }
-        }
-
-        void SpawnEnemy(Vector3 position, Quaternion rotation)
-        {
-            GameObject newEnemy = Instantiate(enemySample, position, rotation) as GameObject;
-
-            newEnemy.transform.SetParent(transform);
-
-            roomEnemies.Add(newEnemy);
         }
 
         void spawnEnemies()
         {
-            enemyCount = spawnPoints.Count;
-            foreach (Transform nextPoint in spawnPoints)
-            {
-                SpawnEnemy(nextPoint.position + new Vector3(0, 0f, 0), nextPoint.rotation);
-            }
-            foreach (GameObject enemy in roomEnemies)
-            {
-                enemy.transform.rotation = Quaternion.identity;
-            }
+            enemiesPhase1.ForEach(x => x.SetActive(true));
         }
 
         void closeDoors()
         {
             foreach (DoorManager door in doors)
             {
-                door.CloseDoor();   
+                door.CloseDoor();
             }
-   
+
             playerManager.DiscardHand();
             playerManager.InCombat = true;
         }
@@ -119,16 +146,18 @@ namespace Complete {
             {
                 door.OpenDoor();
             }
-            rewardPodium.SetActive(true);
-            LightComplete.SetActive(true);
+            //rewardPodium.SetActive(true);
+            //LightComplete.SetActive(true);
             playerManager.InCombat = false;
         }
-        private void OnTriggerEnter(Collider other)
+
+
+        public void StartFight()
         {
-            if ((other.gameObject.name == "Player") && roomState == 0)
+            if (roomState == 0)
             {
                 roomState = 1;
-                CreateExtraSpawnPoints();
+                //CreateExtraSpawnPoints();
                 spawnEnemies();
                 closeDoors();
                 gameObject.layer = 16;

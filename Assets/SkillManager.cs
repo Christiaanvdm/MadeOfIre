@@ -4,6 +4,28 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace Complete
 {
+
+    public static class SkillTypes
+    {
+        public const string Damage = "double_damage";
+        public const string Size = "double_size";
+        public const string Blink = "blink";
+        public const string Glacier = "spawn_glacier";
+        public const string SplitShot = "split_shot";
+        public const string Slow = "half_speed";
+        public const string Duration = "double_duration";
+        public const string Bounce = "bounce";
+        public const string DodgeRoll = "dodge_roll";
+        public const string Chain = "chain_shot";
+    }
+
+    public static class SkillTargets
+    {
+        public const string Ground = "ground";
+        public const string Attack = "attack";
+        public const string Skill = "skill";
+    }
+
     [System.Serializable]
     public class PlayerState
     {
@@ -16,25 +38,10 @@ namespace Complete
         }
     }
 
-    [System.Serializable]
-    public class SkillDetail
-    {
-        public string requiresTarget = "None";
-        public float duration = 2f;
-        public float magnitude = 2f;
-        public string type = "damage";
-        public float cooldown = 1.5f;
-        public float projectileSpeed = 10f;
-        public float projectileSize = 1f;
-        public float projectileDamage;
-        public string skill_name;
-        public string description;
-
-        public string skill_sprite_name;
-    }
-
     public class SkillManager : MonoBehaviour
     {
+        public SkillDetail skillDetail;
+
         public float duration = 2f;
         public float magnitude = 2f;
         public string type = "damage";
@@ -45,7 +52,6 @@ namespace Complete
         public string skill_name;
         public string description;
         public string skill_sprite_name;
-
 
         public AudioSource skillAudio;
         private GameObject player;
@@ -54,10 +60,7 @@ namespace Complete
         private CombatManager combatManager;
         private Renderer beamRenderer;
         private GameObject beam;
-        private GameObject Projectile;
 
-
-        private Rigidbody projectileRigidbody;
         private Transform originTransform;           // Where the projectile is spawned.
         public string requiresTarget = "None";
         private CardManager cardManager;
@@ -75,8 +78,7 @@ namespace Complete
             player = GameObject.Find("Player");
             playerManager = player.GetComponent<PlayerManager>();
             beam = GameObject.Find("BeamAttack");
-            Projectile = GameObject.Find("AttackProjectile");
-            projectileRigidbody = Projectile.gameObject.GetComponent<Rigidbody>();
+
             originTransform = player.transform;
             MainCanvas = GameObject.Find("HUDUICanvas");
             blinkAnim = blinkAnimation.GetComponent<Animator>();
@@ -88,14 +90,15 @@ namespace Complete
 
         }
 
-        void Attack()
+        public void Attack()
         {
-          
+
             Vector3 shotDirection = (FindMousePointRelativeToPlayer() - player.transform.position).normalized;
+            var projectileRigidbody = Resources.Load<Rigidbody>("AttackProjectile");
             Rigidbody projectileInstance = Instantiate(projectileRigidbody, originTransform.position + new Vector3(0, 0.1f, -0.2f), originTransform.rotation) as Rigidbody;
             projectileInstance.velocity = shotDirection * projectileSpeed;
             cardManager.cooldown = 1.5f;
-            projectileInstance.transform.up = new Vector3(0, 1, 0);
+            //projectileInstance.transform.up = new Vector3(0, 1, 0);
             AttackProjectile nextAP = projectileInstance.GetComponent<AttackProjectile>();
             nextAP.speed = projectileSpeed;
             combatManager.ModifyProjectile(ref nextAP);
@@ -104,51 +107,41 @@ namespace Complete
 
         }
 
-        private void ModifySkill()
+        public void ExecuteSkill()
         {
-            //foreach (AttackModifier nextModifier in combatManager.SkillModifierList)
-            //{
-            //    if (nextModifier.type == "double_duration")
-            //    {
-            //        duration = duration * nextModifier.magnitude;
-            //        combatManager.removeAttackModifier(nextModifier);
-            //    }
-            //}
-        }
-
-        public void ExecuteSkill(EnemyManager enemyManager = null, SkillManager TargetSkillManager = null)
-        {
-            if (combatManager.SkillModifierList.Count > 0)
+            if (skillDetail.requiresTarget == SkillTargets.Attack)
             {
-                ModifySkill();
+                AddAttackModifier();
             }
-            if (requiresTarget == "Enemy")
+            else if (requiresTarget == SkillTargets.Skill)
             {
-                SkillsTargetEnemy(enemyManager);
+                AddSkillModifier();
             }
-            else if (requiresTarget == "None")
-            {
-                SkillsTargetNone();
-            }
-            else if (requiresTarget == "Card")
-            {
-                targetSkillManager = TargetSkillManager;
-            }
-            else if (requiresTarget == "Permanent")
-            {
-                SkillsTargetPermanent();
-            }
-            else if (requiresTarget == "Ground")
+            else if (requiresTarget == SkillTargets.Ground)
             {
                 SkillsTargetGround();
+            }
+            else {
+                SkillsTargetPermanent();
+            }
+        }
+
+        private void AddSkillModifier() {
+            if (type == SkillTypes.Duration)
+            {
+                DoubleDuration();
             }
         }
 
         private void SkillsTargetGround()
         {
-            if (type == "spawn_glacier")
+            if (type == SkillTypes.Glacier)
             {
                 SpawnGlacier();
+            }
+            else if (type == SkillTypes.Blink)
+            {
+                Blink();
             }
         }
 
@@ -180,53 +173,34 @@ namespace Complete
                 {
                     first_beam = true;
                     BeamAttack();
-
                 }
             }
         }
 
-        private void SkillsTargetNone()
+        private void AddAttackModifier()
         {
-            if (type == "dodge_roll")
+            if (type == SkillTypes.DodgeRoll)
             {
                 DodgeRoll(true);
             }
-            else if (type == "double_size")
-            {
-                DoubleSize();
-            }
-            else if (type == "double_damage")
-            {
-                DoubleDamage();
-            }
-            else if (type == "double_duration")
-            {
-                DoubleDuration();
-            }
-            else if (type == "half_speed")
+            else if (type == SkillTypes.Slow)
             {
                 EnemyHalfSpeed();
             }
-            else if (type == "split_shot")
-            {
-                SplitShot();
-            }
-            else if (type == "chain_shot")
-            {
-                ChainShot();
-            }
-            else if (type == "spawn_glacier")
-            {           
-                    SpawnGlacier();
-            }
-            else if (type == "blink")
-            {
-               
-                    Blink();
- 
+            else {
+                skillDetail.Execute(combatManager, cardManager);
             }
         }
 
+
+        private void Bounce() {
+            AttackModifier bounceShot = MainCanvas.AddComponent<AttackModifier>();
+            bounceShot.duration = duration;
+            bounceShot.magnitude = magnitude;
+            bounceShot.type = type;
+            bounceShot.icon_name = skill_sprite_name + "Icon";
+            combatManager.addAttackModifier(bounceShot, cardManager);
+        }
         private void Blink()
         {
             player.transform.position = FindMousePointRelativeToPlayer();
@@ -251,7 +225,6 @@ namespace Complete
 
         }
 
-
         private void ChainShot()
         {
             AttackModifier chainShot = MainCanvas.AddComponent<AttackModifier>();
@@ -259,10 +232,8 @@ namespace Complete
             chainShot.magnitude = magnitude;
             chainShot.type = type;
             chainShot.icon_name = skill_sprite_name + "Icon";
-            //doubleDuration.transform.SetParent(MainCanvas.transform);
             combatManager.addAttackModifier(chainShot, cardManager);
         }
-
 
         private void SplitShot()
         {
@@ -287,7 +258,7 @@ namespace Complete
             combatManager.addAttackModifier(enemyHalfSpeed, cardManager);
         }
 
-      
+
         private void DoubleDuration()
         {
             AttackModifier doubleDuration = MainCanvas.AddComponent<AttackModifier>();
@@ -298,9 +269,6 @@ namespace Complete
             //doubleDuration.transform.SetParent(MainCanvas.transform);
             combatManager.addSkillModifier(doubleDuration, cardManager);
         }
-
-
-
 
         private void DoubleDamage()
         {
@@ -333,7 +301,7 @@ namespace Complete
 
         private void CreateNova()
         {
-            GameObject newNova = Instantiate(Resources.Load("Nova")) as GameObject;
+            //GameObject newNova = Instantiate(Resources.Load("Nova")) as GameObject;
         }
 
 
@@ -345,31 +313,31 @@ namespace Complete
         }
         bool first_beam = true;
 
-        void CreateBeam()
-        {
-            if (first_beam)
-            {
-                skillAudio.Play();
-                Vector3 enemyPosition = enemy.gameObject.transform.position;
-                Vector3 playerPosition = player.gameObject.transform.position;
+        //void CreateBeam()
+        //{
+        //    if (first_beam)
+        //    {
+        //        skillAudio.Play();
+        //        Vector3 enemyPosition = enemy.gameObject.transform.position;
+        //        Vector3 playerPosition = player.gameObject.transform.position;
 
-                LineRenderer lr = beam.GetComponent<LineRenderer>();
-                beam.transform.position = playerPosition;
-                Vector3[] positions = new Vector3[2];
-                positions[0] = new Vector3(0.0f, 0.5f, 0.0f);
-                positions[1] = enemyPosition - playerPosition;
-                lr.positionCount = positions.Length;
-                lr.SetPositions(positions);
-                first_beam = false;
-            }
-            else
-            {
+        //        LineRenderer lr = beam.GetComponent<LineRenderer>();
+        //        beam.transform.position = playerPosition;
+        //        Vector3[] positions = new Vector3[2];
+        //        positions[0] = new Vector3(0.0f, 0.5f, 0.0f);
+        //        positions[1] = enemyPosition - playerPosition;
+        //        lr.positionCount = positions.Length;
+        //        lr.SetPositions(positions);
+        //        first_beam = false;
+        //    }
+        //    else
+        //    {
 
-                beamRenderer = beam.gameObject.GetComponent<Renderer>();
-                DestroyBeam();
+        //        beamRenderer = beam.gameObject.GetComponent<Renderer>();
+        //        DestroyBeam();
 
-            }
-        }
+        //    }
+        //}
         float opacityValue = 0.5f;
         private void DestroyBeam()
         {
@@ -409,17 +377,5 @@ namespace Complete
             }
             return mousePointOnFloor;
         }
-
-        public void SkillWithoutEnemy()
-        {
-            ExecuteSkill();
-
-        }
-
-
-
-
     }
-
-
 }

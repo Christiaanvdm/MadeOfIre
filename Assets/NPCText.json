@@ -1,0 +1,12 @@
+{
+  "Collection": [
+    {
+      "id": 1,
+      "dialogue": [ "Hi there! Another hero come to save us all! I am Arthur. [Press C to continue]", "What am I talking about? You were knocked out and woke up here?", "Poor soul, you are in for a rough time. Go talk to Beth up north she might be able to help you out." ]
+    },
+    {
+      "id": 2,
+      "dialogue": [ "Greetings young Hero!", "You're no hero? The cards have chosen you, declaring it otherwise!",  "Go North, towards freedom, past the terrors that reign this land!", "Choose your path carefully... favor be with you."]
+    }
+  ]
+}

@@ -72,6 +72,7 @@
     <Compile Include="Assets\CombatManager.cs" />
     <Compile Include="Assets\CombatMovement.cs" />
     <Compile Include="Assets\CombatMovement2D.cs" />
+    <Compile Include="Assets\ConnectorInit.cs" />
     <Compile Include="Assets\DeathScreen.cs" />
     <Compile Include="Assets\DeckManager.cs" />
     <Compile Include="Assets\DoorManager.cs" />
@@ -80,13 +81,24 @@
     <Compile Include="Assets\EnemyAIImport.cs" />
     <Compile Include="Assets\EnemyAITypeA.cs" />
     <Compile Include="Assets\EnemyAITypeBA.cs" />
+    <Compile Include="Assets\EnemyAxeAnimation.cs" />
+    <Compile Include="Assets\EnemyAxeController.cs" />
+    <Compile Include="Assets\EnemyController.cs" />
     <Compile Include="Assets\EnemyManager.cs" />
     <Compile Include="Assets\EnemyManager2D.cs" />
     <Compile Include="Assets\EnemyProjectile.cs" />
+    <Compile Include="Assets\EnemySlimeController.cs" />
     <Compile Include="Assets\EnemySpriteManager.cs" />
+    <Compile Include="Assets\EnemyZombieController.cs" />
+    <Compile Include="Assets\FightStartTrigger.cs" />
+    <Compile Include="Assets\FloorGenerator.cs" />
     <Compile Include="Assets\Nova.cs" />
+    <Compile Include="Assets\NPCController.cs" />
+    <Compile Include="Assets\OverlayController.cs" />
     <Compile Include="Assets\PlayerManager.cs" />
+    <Compile Include="Assets\PodiumCard.cs" />
     <Compile Include="Assets\PodiumManager.cs" />
+    <Compile Include="Assets\PortalController.cs" />
     <Compile Include="Assets\Projectile.cs" />
     <Compile Include="Assets\ProjectileManager.cs" />
     <Compile Include="Assets\RobotMovementScript.cs" />
@@ -103,10 +115,78 @@
     <Compile Include="Assets\SimpleTimer.cs" />
     <Compile Include="Assets\SkillManager.cs" />
     <Compile Include="Assets\SkillManager_Attack.cs" />
+    <Compile Include="Assets\Skills\SkillDetail.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Demigiant\DOTween\Modules\DOTweenModuleAudio.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Demigiant\DOTween\Modules\DOTweenModulePhysics.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Demigiant\DOTween\Modules\DOTweenModulePhysics2D.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Demigiant\DOTween\Modules\DOTweenModuleSprite.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Demigiant\DOTween\Modules\DOTweenModuleUI.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Demigiant\DOTween\Modules\DOTweenModuleUnityVersion.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Demigiant\DOTween\Modules\DOTweenModuleUtils.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\DottedLineRenderer.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\LineConnection.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\Map.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\MapConfig.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\MapGenerator.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\MapLayer.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\MapManager.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\MapNode.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\MapPlayerTracker.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\MapView.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\MinMax.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\Node.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\NodeBlueprint.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\Point.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\ReorderableList\Example\Example.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\ReorderableList\Example\GameObjectExample.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\ReorderableList\Example\NameOverride.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\ReorderableList\Example\NestedExample.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\ReorderableList\Example\RecursionTest.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\ReorderableList\Example\SurrogateTest.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\ReorderableList\List\Attributes\ReorderableAttribute.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\ReorderableList\List\ReorderableArray.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\ScrollNonUI.cs" />
+    <Compile Include="Assets\slay-the-spire-map-in-unity\Assets\Scripts\ShufflingExtension.cs" />
+    <Compile Include="Assets\SpeedTutor_Full_Menu_System\GUI Elements\UI_BrightnessShader\Brightness.cs" />
+    <Compile Include="Assets\SpeedTutor_Full_Menu_System\MenuScripts\Init_LoadPreferences.cs" />
+    <Compile Include="Assets\SpeedTutor_Full_Menu_System\MenuScripts\MenuController.cs" />
+    <Compile Include="Assets\StartRoomInit.cs" />
+    <Compile Include="Assets\StartRoomManager.cs" />
     <Compile Include="Assets\TerrainManager.cs" />
     <Compile Include="Assets\TravelManager.cs" />
+    <Compile Include="Assets\TreeController.cs" />
     <Compile Include="Assets\ZoneObject.cs" />
+    <None Include="Assets\slay-the-spire-map-in-unity\Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface-Mobile.shader" />
+    <None Include="Assets\slay-the-spire-map-in-unity\Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
+    <None Include="Assets\slay-the-spire-map-in-unity\Assets\Sprites\game-icons.net\license.txt" />
+    <None Include="Assets\slay-the-spire-map-in-unity\Assets\Shaders\Scroll.shader" />
+    <None Include="Assets\slay-the-spire-map-in-unity\Assets\TextMesh Pro\Resources\Shaders\TMPro_Properties.cginc" />
+    <None Include="Assets\slay-the-spire-map-in-unity\Assets\TextMesh Pro\Resources\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
+    <None Include="Assets\WIP\Fonts\SIL Open Font License.txt" />
+    <None Include="Assets\WIP\Dungeon\Rooms\Room1\AlwaysVisible.shader" />
+    <None Include="Assets\slay-the-spire-map-in-unity\Assets\Shaders\MADFINGER-Unlit-Scroll2Layers-Sine-AlphaBlend-No-Amp.shader" />
+    <None Include="Assets\WIP\Dungeon\Rooms\Room2\Shaders\TreeShader.shader" />
+    <None Include="Assets\SpeedTutor_Full_Menu_System\GUI Elements\UI_BrightnessShader\BrightnessEffect.shader" />
+    <None Include="Assets\slay-the-spire-map-in-unity\Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
+    <None Include="Assets\slay-the-spire-map-in-unity\Assets\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
+    <None Include="Assets\slay-the-spire-map-in-unity\Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Mobile Masking.shader" />
+    <None Include="Assets\slay-the-spire-map-in-unity\Assets\JsonDotNet\link.xml" />
+    <None Include="Assets\slay-the-spire-map-in-unity\Assets\Demigiant\DOTween\readme.txt" />
+    <None Include="Assets\slay-the-spire-map-in-unity\Assets\TextMesh Pro\Resources\Shaders\TMP_Bitmap-Mobile.shader" />
+    <None Include="Assets\WIP\Dungeon\Rooms\Room2\Shaders\StandardPlayerBackgroundFade.shader" />
+    <None Include="Assets\slay-the-spire-map-in-unity\Assets\TextMesh Pro\Resources\Shaders\TMP_SDF Overlay.shader" />
+    <None Include="Assets\slay-the-spire-map-in-unity\Assets\TextMesh Pro\Fonts\LiberationSans - OFL.txt" />
+    <None Include="Assets\slay-the-spire-map-in-unity\Assets\TextMesh Pro\Resources\Shaders\TMPro_Surface.cginc" />
+    <None Include="Assets\slay-the-spire-map-in-unity\Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Mobile Overlay.shader" />
+    <None Include="Assets\slay-the-spire-map-in-unity\ProjectSettings\ProjectVersion.txt" />
+    <None Include="Assets\slay-the-spire-map-in-unity\Assets\TextMesh Pro\Resources\Shaders\TMP_Bitmap.shader" />
+    <None Include="Assets\slay-the-spire-map-in-unity\Assets\TextMesh Pro\Resources\Shaders\TMPro.cginc" />
+    <None Include="Assets\WIP\Dungeon\Rooms\Room2\Shaders\ShowPlayer.shader" />
+    <None Include="Assets\slay-the-spire-map-in-unity\Assets\TextMesh Pro\Resources\Shaders\TMP_SDF.shader" />
     <None Include="Assets\Tanks!_Third-PartyNotice.txt" />
+    <None Include="Assets\slay-the-spire-map-in-unity\Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Mobile.shader" />
+    <None Include="Assets\slay-the-spire-map-in-unity\Assets\TextMesh Pro\Resources\Shaders\TMP_Sprite.shader" />
+    <None Include="Assets\slay-the-spire-map-in-unity\Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface.shader" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>C:/UnityProjects/MadeOfIre/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>
@@ -310,6 +390,12 @@
     </Reference>
     <Reference Include="UnityEngine.XRModule">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.15f1/Editor/Data/Managed/UnityEngine/UnityEngine.XRModule.dll</HintPath>
+    </Reference>
+    <Reference Include="DOTween">
+      <HintPath>C:/UnityProjects/MadeOfIre/Assets/slay-the-spire-map-in-unity/Assets/Demigiant/DOTween/DOTween.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>C:/UnityProjects/MadeOfIre/Assets/slay-the-spire-map-in-unity/Assets/JsonDotNet/Assemblies/Standalone/Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.15f1/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>
@@ -665,6 +751,16 @@
     <Reference Include="Boo.Lang">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.15f1/Editor/Data/MonoBleedingEdge/lib/mono/unityscript/Boo.Lang.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="NavMeshComponentsEditor.csproj">
+      <Project>{17E0F641-CE18-01A5-4D74-4639F922A9EF}</Project>
+      <Name>NavMeshComponentsEditor</Name>
+    </ProjectReference>
+    <ProjectReference Include="NavMeshComponents.csproj">
+      <Project>{1CDA0DBC-E9D0-4B0F-FC72-A6FF4D46D796}</Project>
+      <Name>NavMeshComponents</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

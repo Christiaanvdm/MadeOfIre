@@ -1,35 +1,9 @@
 {
   "current_deck": [
     {
-      "requiresTarget": "None",
+      "requiresTarget": "attack",
       "duration": 4.0,
       "magnitude": 2,
-      "type": "split_shot",
-      "projectileSpeed": 10.0,
-      "projectileSize": 1.0,
-      "projectileDamage": 0.0,
-      "skill_name": "",
-      "description": "Split Shot",
-      "skill_sprite_name": "SplitShot",
-      "cooldown": "1"
-    },
-    {
-      "requiresTarget": "None",
-      "duration": 4.0,
-      "magnitude": 2,
-      "type": "chain_shot",
-      "projectileSpeed": 10.0,
-      "projectileSize": 1.0,
-      "projectileDamage": 0.0,
-      "skill_name": "",
-      "description": "Chain Shot",
-      "skill_sprite_name": "ChainShot",
-      "cooldown": "1.5"
-    },
-    {
-      "requiresTarget": "None",
-      "duration": 4.0,
-      "magnitude": 0.5,
       "type": "half_speed",
       "projectileSpeed": 10.0,
       "projectileSize": 1.0,
@@ -40,33 +14,33 @@
       "cooldown": "1.5"
     },
     {
-      "requiresTarget": "None",
-      "duration": 2.0,
-      "magnitude": 2.0,
-      "type": "double_duration",
+      "requiresTarget": "attack",
+      "duration": 4.0,
+      "magnitude": 1,
+      "type": "bounce",
       "projectileSpeed": 10.0,
       "projectileSize": 1.0,
       "projectileDamage": 0.0,
       "skill_name": "",
-      "description": "Duration",
-      "skill_sprite_name": "Duration",
+      "description": "Bounce",
+      "skill_sprite_name": "Bounce",
       "cooldown": "1.5"
     },
     {
-      "requiresTarget": "None",
-      "duration": 2.0,
-      "magnitude": 3.0,
-      "type": "double_size",
+      "requiresTarget": "attack",
+      "duration": 4.0,
+      "magnitude": 2,
+      "type": "half_speed",
       "projectileSpeed": 10.0,
       "projectileSize": 1.0,
       "projectileDamage": 0.0,
       "skill_name": "",
-      "description": "Size",
-      "skill_sprite_name": "Size",
+      "description": "Half Speed",
+      "skill_sprite_name": "HalfSpeed",
       "cooldown": "1.5"
     },
     {
-      "requiresTarget": "None",
+      "requiresTarget": "ground",
       "duration": 5.0,
       "magnitude": 30,
       "type": "blink",
@@ -79,18 +53,30 @@
       "cooldown": "1.5"
     },
     {
-      "requiresTarget": "None",
-      "duration": 5.0,
-      "magnitude": 2,
-      "type": "spawn_glacier",
+      "requiresTarget": "skill",
+      "duration": 2.0,
+      "magnitude": 2.0,
+      "type": "double_duration",
       "projectileSpeed": 10.0,
       "projectileSize": 1.0,
       "projectileDamage": 0.0,
       "skill_name": "",
-      "description": "Create Glacier",
-      "skill_sprite_name": "SpawnGlacier",
+      "description": "Duration",
+      "skill_sprite_name": "Duration",
+      "cooldown": "1.5"
+    },
+    {
+      "requiresTarget": "skill",
+      "duration": 2.0,
+      "magnitude": 2.0,
+      "type": "double_duration",
+      "projectileSpeed": 10.0,
+      "projectileSize": 1.0,
+      "projectileDamage": 0.0,
+      "skill_name": "",
+      "description": "Duration",
+      "skill_sprite_name": "Duration",
       "cooldown": "1.5"
     }
-
   ]
 }

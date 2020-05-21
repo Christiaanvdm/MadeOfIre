@@ -9,7 +9,7 @@ namespace Complete
 {
     public class PlayerManager : MonoBehaviour
     {
-  
+
         private float dodgeRollDuration = 0.69f;
         private float health = 6f;
         //private float maximum_health = 100f;
@@ -74,6 +74,7 @@ namespace Complete
             {
                 updateOrientation();
             }
+            SetEnvironmentSprites();
         }
         private void FixedUpdate()
         {
@@ -122,7 +123,7 @@ namespace Complete
             // Look at mouse
             Vector3 mouseRelativeToPlayer = FindMousePointRelativeToPlayerClean() - player.gameObject.transform.position;
 
-            float mouseAngle = getForward360Angle(mouseRelativeToPlayer.normalized);    
+            float mouseAngle = getForward360Angle(mouseRelativeToPlayer.normalized);
             if ((mouseAngle >= 0) && (mouseAngle < 22.5)) {
                 lookUp();
             }
@@ -322,7 +323,7 @@ namespace Complete
 
                     if (enemyAP)
                     {
-                        Damage(1, "blunt");
+                        Damage(enemyAP.damage, "blunt");
                     }
             }
             if (colliderGO.tag == "enemy")
@@ -340,7 +341,7 @@ namespace Complete
         private void DodgeRollUp()
         {
             anim.SetInteger("State", 11);
-   
+
         }
         private void DodgeRollRightUp()
         {
@@ -367,7 +368,7 @@ namespace Complete
             character.transform.localScale = newScale;
             anim.SetInteger("State", 12);
         }
-      
+
         private void DodgeRollLeft()
         {
             Vector3 newScale = new Vector3(spriteOriginalScale.x * -1, spriteOriginalScale.y, spriteOriginalScale.z);
@@ -381,7 +382,7 @@ namespace Complete
             anim.SetInteger("State", 14);
         }
 
-      
+
         IEnumerator DodgeRollCoroutine()
         {
             for (; ; )
@@ -395,15 +396,15 @@ namespace Complete
 
         private void dodgeRoll()
         {
-           
+
             if (!inDodgeRoll)
             {
                 nextUpdateForDodgeRoll = Time.time + dodgeRollDuration;
                 StartDodgeRoll();
                 inDodgeRoll = true;
-           
+
             }
-     
+
             float direction = getForward360Angle(rigidBody.velocity.normalized);
             if ((direction >= 0) && (direction < 22.5))
             {
@@ -445,8 +446,8 @@ namespace Complete
 
 
               float speedAngle = getForward360Angle(rigidBody.velocity.normalized);
-            
-           
+
+
 
         }
 
@@ -462,7 +463,7 @@ namespace Complete
             }
             else return 0;
         }
-      
+
       public void StartDodgeRoll()
         {
             gameObject.layer = 15;
@@ -496,19 +497,23 @@ namespace Complete
 
         public void LoadPlayerCards()
         {
-            //string path = "Assets/PlayerCards.json";
-            //StreamReader reader = new StreamReader(path);
-            //string readerString = reader.ReadToEnd();
 
-            //reader.Close();
-            string readerString = playerCards.text;
+            string readerString = "";
+            if (!PlayerPrefs.HasKey("Cards"))
+            {
+                readerString = playerCards.text;
+                PlayerPrefs.SetString("Cards", readerString);
+            }
+            else {
+                readerString = PlayerPrefs.GetString("Cards");
+            }
+
             current_deck.Clear();
             PlayerState playerState = JsonUtility.FromJson<PlayerState>(readerString);
             current_deck = playerState.current_deck;
             draw_pile = current_deck.OrderBy(x => Random.value).ToList();
             StartCoroutine("slightlyAfterStart");
             discard_pile.Clear();
-
         }
 
         IEnumerator slightlyAfterStart()
@@ -522,16 +527,13 @@ namespace Complete
             yield return null;
         }
 
-
-
-
         public void DrawCard(string cardIdentifier, bool AddToDiscardPile = true)
         {
              if (draw_pile.Count == 0)
             {
                 ShuffleDiscardToDrawPile();
             }
-          
+
             GameObject nextSlot = GameObject.Find(cardIdentifier);
             SkillManager oldSkillManager = new SkillManager();
             oldSkillManager = nextSlot.GetComponent<SkillManager>();
@@ -548,13 +550,15 @@ namespace Complete
             var InActiveSprite = Resources.Load<Sprite>("InactiveCard" + nextCard.skill_sprite_name);
             spriteActiveCardRenderer.sprite = ActiveSprite;
             spriteInactiveCardRenderer.sprite = InActiveSprite;
+            skillManager.skillDetail = nextCard;
             skillManager.duration = nextCard.duration;
             skillManager.magnitude = nextCard.magnitude;
             skillManager.description = nextCard.description;
             skillManager.type = nextCard.type;
             skillManager.skill_sprite_name = nextCard.skill_sprite_name;
             skillManager.cooldown = nextCard.cooldown;
-           
+            skillManager.requiresTarget = nextCard.requiresTarget;
+
             draw_pile.Remove(nextCard);
         }
 
@@ -566,21 +570,31 @@ namespace Complete
 
         public void SavePlayerCards()
         {
-            //PlayerState playerState = new PlayerState();
-            //SkillDetail newSkillDetail = new SkillDetail();
-            //newSkillDetail.description = "Some description";
-            //playerState.current_deck = current_deck;
-            //string path = "PlayerCards.json";
-            //StreamWriter writer = new StreamWriter(path, true);
-            //writer.Write(JsonUtility.ToJson(playerState));
-            //writer.Close();
+            PlayerState playerState = new PlayerState();
+            SkillDetail newSkillDetail = new SkillDetail();
+            newSkillDetail.description = "Some description";
+            playerState.current_deck = current_deck;
+            PlayerPrefs.SetString("Cards", JsonUtility.ToJson(playerState));
+        }
+
+
+        public void SavePlayerCardsToFile()
+        {
+            PlayerState playerState = new PlayerState();
+            SkillDetail newSkillDetail = new SkillDetail();
+            newSkillDetail.description = "Some description";
+            playerState.current_deck = current_deck;
+            string path = "PlayerCards.json";
+            StreamWriter writer = new StreamWriter(path, true);
+            writer.Write(JsonUtility.ToJson(playerState));
+            writer.Close();
         }
 
         public void DiscardHand()
         {
             foreach (GameObject card in playerCardGameObjectList)
             {
-       
+
                 card.GetComponent<CardManager>().DiscardCard();
             }
         }
@@ -616,8 +630,52 @@ namespace Complete
         }
 
         public CardManager getCardByIndex(int i) {
-            return playerCardManagerList[i];       
+            return playerCardManagerList[i];
         }
 
+
+        public void AdvanceConversation()
+        {
+            Collider[] hitColliders = Physics.OverlapSphere(transform.position, 3);
+            foreach (Collider collider in hitColliders) {
+                if (collider.gameObject.tag == "npc") {
+                    collider.transform.GetComponent<NPCController>().advanceStep();
+                }
+            }
+        }
+
+
+        private void SetEnvironmentSprites()
+        {
+                                RaycastHit hit;
+            var cameraPos = Camera.main.transform.position;
+            if (Physics.Raycast(cameraPos, transform.position - cameraPos, out hit, Mathf.Infinity))
+            {
+
+                //if (hit.collider.gameObject.tag == "player")
+                //{
+                //    character.GetComponent<SpriteRenderer>().sortingLayerID = 2;
+                //    //var renderer = transform.Find("Sphere").GetComponent<Renderer>();
+                //    //if (seeThroughSize > 0) {
+                //    //    seeThroughSize -= seeThroughSizeScaleRate * Time.deltaTime;
+                //    //}
+                //    //renderer.material.SetFloat("_ScaleX", seeThroughSize);
+                //    //renderer.material.SetFloat("_ScaleY", seeThroughSize);
+                //}
+                //else {
+                //    character.GetComponent<SpriteRenderer>().sortingLayerID = 0;
+                //    //var renderer = transform.Find("Sphere").GetComponent<Renderer>();
+                //    //if (seeThroughSize < 2)
+                //    //{
+                //    //    seeThroughSize += seeThroughSizeScaleRate * Time.deltaTime;
+                //    //}
+                //    //renderer.material.SetFloat("_ScaleX", seeThroughSize);
+                //    //renderer.material.SetFloat("_ScaleY", seeThroughSize);
+                //}
+            }
+        }
+
+        private float seeThroughSizeScaleRate = 3;
+        private float seeThroughSize = 0;
     }
 }

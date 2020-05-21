@@ -5,6 +5,8 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.AI;
+using System;
+using System.Threading.Tasks;
 
 namespace Complete
 {
@@ -50,11 +52,12 @@ namespace Complete
         private DeckManager deckManager;
         private DeathScreen deathScreen;
 
-        Quaternion initialOrientation;
+        public string currentRoom = "StartRoom";
         // Start is called before the first frame update
         void Start()
         {
-
+            if (!PlayerPrefs.HasKey("CurrentRoom"))
+                PlayerPrefs.SetString("CurrentRoom", "StartRoom");
             deathScreen = Resources.FindObjectsOfTypeAll<DeathScreen>()[0];
             deathScreen.gameObject.SetActive(false);
             DeckManagerGO = Resources.FindObjectsOfTypeAll<DeckManager>()[0].gameObject;
@@ -71,8 +74,18 @@ namespace Complete
             healthSample = GameObject.Find("Health");
             deckManager = DeckManagerGO.GetComponent<DeckManager>();
             UpdateHUDHealth(6);
+            SpawnRoom();
+        }
 
+        public void SpawnRoom()
+        {
+            var currentRoom = PlayerPrefs.GetString("CurrentRoom");
+            var room = Resources.Load<GameObject>($"Rooms/{currentRoom}");
 
+            GameObject newRoom = Instantiate(room) as GameObject;
+            var entrance = transform.Find("Exit");
+
+            newRoom.transform.position = GameObject.Find("RoomOrigin").transform.position;
         }
 
         // Update is called once a frame
@@ -92,7 +105,6 @@ namespace Complete
             }
         }
 
-
         public void PlacingTerrain()
         {
             screenPoint = Camera.main.WorldToScreenPoint(terrainPlacement.transform.position);
@@ -100,8 +112,8 @@ namespace Complete
             cursorScreenPoint.y = 0;
             //Vector3 cursorPosition = Camera.main.ScreenToWorldPoint(cursorScreenPoint);
             terrainPlacement.transform.position = cursorScreenPoint;
-
         }
+
         public bool GamePaused = false;
         public void PauseGame()
         {
@@ -118,6 +130,7 @@ namespace Complete
 
         public void ModifyProjectile(ref AttackProjectile projectile)
         {
+
             projectile.allAttackModifiers.AddRange(AttackModifierList);
             foreach (AttackModifier nextAM in AttackModifierList)
             {
@@ -144,9 +157,12 @@ namespace Complete
                     {
                         ApplyChainToProjectile(ref projectile, nextAM);
                     }
-
+                    if (nextAM.type == "bounce") {
+                        AddBounceToProject(ref projectile, nextAM);
+                    }
                 }
             }
+
         }
 
         private void ApplyChainToProjectile(ref AttackProjectile projectile, AttackModifier nextAM)
@@ -154,6 +170,12 @@ namespace Complete
             nextAM.context = "Hit";
             projectile.AddModifier(nextAM);
         }
+
+
+        private void AddBounceToProject(ref AttackProjectile projectile, AttackModifier nextAM) {
+            projectile.AddBounces(Mathf.RoundToInt(nextAM.magnitude));
+        }
+
         public void UpdateHUDHealth(int newHP)
         {
             int healthCount = healthIcons.Count;
@@ -226,17 +248,39 @@ namespace Complete
             {
                 SpaceUp();
             }
-      
+            if (Input.GetKey(KeyCode.Return))
+            {
+                ReturnDown();
+            }
+            else if (Input.GetKeyUp(KeyCode.Return))
+            {
+                ReturnUp();
+            }
         }
 
-        void SpaceDown() {
-           
+        void SpaceDown()
+        {
+
         }
-      
+
+        void CDown() {
+            playerManager.AdvanceConversation();
+        }
+
+        void CUp() { }
+
+        void ReturnDown() {
+
+        }
+
+        void ReturnUp() {
+
+        }
+
         void checkKey()
         {
             if (playerManager)
-             //&& playerManager.InCombat)
+            //&& playerManager.InCombat)
             {
                 if (Input.GetKey(KeyCode.Q))
                 {
@@ -320,6 +364,14 @@ namespace Complete
             {
                 F1Up();
             }
+            if (Input.GetKey(KeyCode.C))
+            {
+                CDown();
+            }
+            else if (Input.GetKeyUp(KeyCode.C))
+            {
+                CUp();
+            }
 
         }
 
@@ -373,12 +425,12 @@ namespace Complete
             inMenu = true;
         }
 
-        public void EnterMenu(SkillDetail newCard, PodiumManager podium)
+        public void EnterMenu(SkillDetail newCard)
         {
             PauseGame();
             DeckManagerGO.SetActive(true);
             inMenu = true;
-            deckManager.AddCardMenu(newCard, podium);
+            deckManager.AddCardMenu(newCard);
         }
 
         public void Death()
@@ -502,7 +554,9 @@ namespace Complete
             if (isPlacingTerain)
             {
                 PlaceTerrain();
+                return;
             }
+
         }
 
         void Mouse1Up()
@@ -562,17 +616,17 @@ namespace Complete
             newAM.id = uniqueSpellID;
 
             GameObject skillCooldownSample = new GameObject();
-            skillCooldownSample = GameObject.Find("SkillCooldown");
+            skillCooldownSample = Resources.Load<GameObject>("skillCooldown");
             int thisAMCount = AttackModifierList.Count + 1;
 
             newAM.skillCooldownClone = Instantiate(skillCooldownSample, canvasGameObject.transform);
             //newAM.skillCooldownClone.gameObject.transform.SetPositionAndRotation(new Vector3(11, -277, 0),
             //newAM.skillCooldownClone.gameObject.transform.rotation);
             newAM.skillCooldownClone.gameObject.transform.SetPositionAndRotation(new Vector3(
-                newAM.skillCooldownClone.gameObject.transform.position.x + (thisAMCount * iconWidth),
-                newAM.skillCooldownClone.gameObject.transform.position.y + 135,
-                newAM.skillCooldownClone.gameObject.transform.position.z),
-                newAM.skillCooldownClone.gameObject.transform.rotation);
+            newAM.skillCooldownClone.gameObject.transform.position.x + (thisAMCount * iconWidth),
+            newAM.skillCooldownClone.gameObject.transform.position.y + 135,
+            newAM.skillCooldownClone.gameObject.transform.position.z),
+            newAM.skillCooldownClone.gameObject.transform.rotation);
 
             if (SkillModifierList.Count > 0)
             {
@@ -580,13 +634,33 @@ namespace Complete
             }
 
             Image spriteIcon = newAM.skillCooldownClone.transform.Find("CooldownIcon").gameObject.GetComponent<Image>();
+
             var skillSprite = Resources.Load<Sprite>(newAM.icon_name);
             spriteIcon.sprite = skillSprite;
 
             AttackModifierList.Add(newAM);
-            newAM.startTimer(newAM, null, this);
+            startAMCooldown(newAM);
             originCard.DiscardCard();
 
+        }
+
+        public void startAMCooldown(AttackModifier attackModifier)
+        {
+            if (attackModifier.start)
+                throw new Exception("Start Timer called twice on one attack modifier");
+
+            Image skillCooldown = attackModifier.skillCooldownClone.GetComponent<Image>();
+            cooldownIcon(attackModifier, skillCooldown);
+        }
+
+        private async Task cooldownIcon(AttackModifier attackModifier, Image skillCooldownImage) {
+            var duration = (attackModifier.duration);
+            while (skillCooldownImage.fillAmount > 0) {
+                await Task.Delay(Mathf.RoundToInt(Time.fixedDeltaTime * 1000));
+                skillCooldownImage.fillAmount -= (1 / duration) * Time.fixedDeltaTime;
+            }
+
+            removeAttackModifier(attackModifier);
         }
 
         public void ModifyAttackModifier(AttackModifier amToModify)
@@ -611,13 +685,11 @@ namespace Complete
                 if ((sm.type == "double_duration") & (sm.is_enabled == true))
                 {
                     sm.duration = amToModify.duration;
-                    sm.startTimer(sm, null, this);
+                    this.startAMCooldown(sm);
                     sm.is_enabled = false;
                 }
             }
         }
-
-
 
         public void removeAttackModifier(AttackModifier am_to_remove)
         {
@@ -658,10 +730,8 @@ namespace Complete
         private int uniqueTerainModiferID = 0;
         public void AddTerainModifier(AttackModifier newTM, CardManager originCard)
         {
-
             uniqueTerainModiferID++;
             newTM.id = uniqueSkillModifierID;
-
         }
 
 
@@ -711,7 +781,6 @@ namespace Complete
                 Destroy(sm_to_remove.skillCooldownClone);
                 Destroy(sm_to_remove);
             }
-
         }
 
 
@@ -721,7 +790,7 @@ namespace Complete
         {
             update_count = 0;
             Vector3 spawnPoint = FindMousePointRelativeToPlayer();
-            spawnPoint.y = 0;
+            //spawnPoint.y = 0;
             Rigidbody terrainInstance = Instantiate(terrainTemplate, spawnPoint, terrainTemplate.rotation) as Rigidbody;
             tm = terrainInstance.gameObject.GetComponent<TerrainManager>();
             StartCoroutine("CheckForCollision");
@@ -780,13 +849,10 @@ namespace Complete
         {
             Vector3 mousePointOnFloor = FindMousePointOnFloor();
             mousePointOnFloor = new Vector3(mousePointOnFloor.x,
-                                            mousePointOnFloor.y - player.transform.position.y,
+                                            mousePointOnFloor.y,
                                             mousePointOnFloor.z);
             return mousePointOnFloor;
         }
 
     }
-
-
-
 }
