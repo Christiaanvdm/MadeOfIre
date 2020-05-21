@@ -104,7 +104,7 @@ namespace Complete {
             }
         }
 
-        void LoadListToPannel(Transform CardsParent, List<SkillDetail> Cards)
+        void LoadListToPannel(Transform CardsParent, List<AbstractSkillDetail> Cards)
         {
             int cardCount = 0;
             foreach (SkillDetail nextCard in Cards)
@@ -203,8 +203,8 @@ namespace Complete {
 
         public void AddCard()
         {
-            playerManager.current_deck.Add(cardBeingAdded);
-            playerManager.draw_pile.Add(cardBeingAdded);
+            playerManager.current_deck.Add((AbstractSkillDetail)cardBeingAdded);
+            playerManager.draw_pile.Add((AbstractSkillDetail)cardBeingAdded);
             combatManager.LeaveMenu();
             currentPodium.DisablePodium();
         }

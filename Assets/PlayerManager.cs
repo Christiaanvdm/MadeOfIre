@@ -4,6 +4,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
 using System.Linq;
+using DG.Tweening;
+using System.Runtime.Remoting.Contexts;
+using System;
+using System.Runtime.InteropServices;
 
 namespace Complete
 {
@@ -29,9 +33,9 @@ namespace Complete
         private float nextFlash;
         private bool flashOn = true;
         private float DamageTimerDuration = 0.5f;
-        public List<SkillDetail> current_deck = new List<SkillDetail>();
-        public List<SkillDetail> draw_pile = new List<SkillDetail>();
-        public List<SkillDetail> discard_pile = new List<SkillDetail>();
+        public List<AbstractSkillDetail> current_deck = new List<AbstractSkillDetail>();
+        public List<AbstractSkillDetail> draw_pile = new List<AbstractSkillDetail>();
+        public List<AbstractSkillDetail> discard_pile = new List<AbstractSkillDetail>();
         private List<GameObject> playerCardGameObjectList = new List<GameObject>();
         private List<SkillManager> playerCardSkillManagerList = new List<SkillManager>();
         private List<CardManager> playerCardManagerList = new List<CardManager>();
@@ -43,6 +47,14 @@ namespace Complete
         // Start is called before the first frame update
         void Start()
         {
+            //PlayerState newState = new PlayerState();
+            //SkillModifier skillModifier = new SkillModifier();
+            //skillModifier.context = "something";
+            //newState.current_deck.Add(skillModifier);
+            //var jsonstring = JsonUtility.ToJson(newState);
+            //int i = 0;
+
+
             combatManager = GameObject.Find("SceneManager").GetComponent<CombatManager>();
             player = GameObject.Find("Player");
             rigidBody = gameObject.GetComponent<Rigidbody>();
@@ -510,10 +522,58 @@ namespace Complete
 
             current_deck.Clear();
             PlayerState playerState = JsonUtility.FromJson<PlayerState>(readerString);
-            current_deck = playerState.current_deck;
-            draw_pile = current_deck.OrderBy(x => Random.value).ToList();
+            SetupCardTypes(playerState.current_deck);
+            draw_pile = current_deck.OrderBy(x => UnityEngine.Random.value).ToList();
             StartCoroutine("slightlyAfterStart");
             discard_pile.Clear();
+
+        }
+
+        public void SetupCardTypes(List<SkillDetail> savedDeck)
+        {
+            for (int i = 0; i < savedDeck.Count; i++)
+            {
+                CreateConcreteSkillAndAddToDeck(savedDeck[i]);
+            }
+        }
+
+        private void CreateConcreteSkillAndAddToDeck(SkillDetail sd) {
+            AbstractSkillDetail baseModifier = null;
+            if (sd.requiresTarget == SkillTargets.Attack)
+            {
+                baseModifier = new AttackModifier();
+
+                baseModifier = MapSkillDetailToAbstract(baseModifier, sd);
+                current_deck.Add(baseModifier);
+            }
+            if (sd.requiresTarget == SkillTargets.Skill)
+            {
+                baseModifier = new SkillModifier();
+                baseModifier = MapSkillDetailToAbstract(baseModifier, sd);
+                current_deck.Add(baseModifier);
+            }
+
+
+        }
+
+        private AbstractSkillDetail MapSkillDetailToAbstract(AbstractSkillDetail am, SkillDetail sd) {
+            am.class_name = sd.class_name;
+            am.context = sd.context;
+            am.cooldown = sd.cooldown;
+            am.description = sd.description;
+            am.duration = sd.duration;
+            am.enabled = sd.enabled;
+            am.icon_name = sd.icon_name;
+            am.id = sd.id;
+            am.magnitude = sd.magnitude;
+            am.projectileDamage = sd.projectileDamage;
+            am.modifier_count = sd.modifier_count;
+            am.requiresTarget = sd.requiresTarget;
+            am.skill_name = sd.skill_name;
+            am.skill_sprite_name = sd.skill_sprite_name;
+            am.type = sd.type;
+
+            return am;
         }
 
         IEnumerator slightlyAfterStart()
@@ -535,30 +595,35 @@ namespace Complete
             }
 
             GameObject nextSlot = GameObject.Find(cardIdentifier);
-            SkillManager oldSkillManager = new SkillManager();
-            oldSkillManager = nextSlot.GetComponent<SkillManager>();
-            SkillDetail oldSkillDetail = convertSkillManagerToSkillDetail(oldSkillManager);
+            SkillManager oldSkillManager = nextSlot.GetComponent<SkillManager>();
+            AbstractSkillDetail oldSkillDetail = null;
+            if (oldSkillManager.info == null)
+                oldSkillManager.info = new AttackModifier();
+            if (oldSkillManager.info.class_name == "SkillModifier")
+            {
+                AbstractSkillDetail sm = new SkillModifier();
+                sm = oldSkillManager.info;
+                oldSkillDetail = sm;
+            }
+            else if (oldSkillManager.info.class_name == "AttackModifier")
+            {
+                AbstractSkillDetail am = new AttackModifier();
+                am = oldSkillManager.info;
+                oldSkillDetail = am;
+            }
             if (AddToDiscardPile)
             {
                 discard_pile.Add(oldSkillDetail);
             }
             SkillManager skillManager = nextSlot.GetComponent<SkillManager>();
-            SkillDetail nextCard = draw_pile[0];
+            AbstractSkillDetail nextCard = draw_pile[0];
             SpriteRenderer spriteActiveCardRenderer = nextSlot.transform.Find("Sprite").gameObject.GetComponent<SpriteRenderer>();
             SpriteRenderer spriteInactiveCardRenderer = nextSlot.transform.Find("InactiveCard").gameObject.GetComponent<SpriteRenderer>();
             var ActiveSprite = Resources.Load<Sprite>("ActiveCard" + nextCard.skill_sprite_name);
             var InActiveSprite = Resources.Load<Sprite>("InactiveCard" + nextCard.skill_sprite_name);
             spriteActiveCardRenderer.sprite = ActiveSprite;
             spriteInactiveCardRenderer.sprite = InActiveSprite;
-            skillManager.skillDetail = nextCard;
-            skillManager.duration = nextCard.duration;
-            skillManager.magnitude = nextCard.magnitude;
-            skillManager.description = nextCard.description;
-            skillManager.type = nextCard.type;
-            skillManager.skill_sprite_name = nextCard.skill_sprite_name;
-            skillManager.cooldown = nextCard.cooldown;
-            skillManager.requiresTarget = nextCard.requiresTarget;
-
+            skillManager.info = nextCard;
             draw_pile.Remove(nextCard);
         }
 
@@ -571,9 +636,9 @@ namespace Complete
         public void SavePlayerCards()
         {
             PlayerState playerState = new PlayerState();
-            SkillDetail newSkillDetail = new SkillDetail();
+            SkillDetail newSkillDetail = new SkillModifier();
             newSkillDetail.description = "Some description";
-            playerState.current_deck = current_deck;
+            //playerState.current_deck = current_deck;
             PlayerPrefs.SetString("Cards", JsonUtility.ToJson(playerState));
         }
 
@@ -581,9 +646,9 @@ namespace Complete
         public void SavePlayerCardsToFile()
         {
             PlayerState playerState = new PlayerState();
-            SkillDetail newSkillDetail = new SkillDetail();
+            SkillDetail newSkillDetail = new SkillModifier();
             newSkillDetail.description = "Some description";
-            playerState.current_deck = current_deck;
+            //playerState.current_deck = current_deck;
             string path = "PlayerCards.json";
             StreamWriter writer = new StreamWriter(path, true);
             writer.Write(JsonUtility.ToJson(playerState));
@@ -599,35 +664,6 @@ namespace Complete
             }
         }
 
-        public SkillDetail convertSkillManagerToSkillDetail(SkillManager skillManager)
-        {
-            SkillDetail sd = new SkillDetail();
-            sd.cooldown = skillManager.cooldown;
-            sd.description = skillManager.description;
-            sd.duration = skillManager.duration;
-            sd.magnitude = skillManager.magnitude;
-            sd.projectileSize = skillManager.projectileSize;
-            sd.projectileSpeed = skillManager.projectileSpeed;
-            sd.skill_name = skillManager.skill_name;
-            sd.skill_sprite_name = skillManager.skill_sprite_name;
-            sd.type = skillManager.type;
-            return sd;
-        }
-
-        public SkillManager convertSkillDetailToSkillManager(SkillDetail skillDetail)
-        {
-            SkillManager skillManager = new SkillManager();
-            skillManager.cooldown = skillDetail.cooldown;
-            skillManager.description = skillDetail.description;
-            skillManager.duration = skillDetail.duration;
-            skillManager.magnitude = skillDetail.magnitude;
-            skillManager.projectileSize = skillDetail.projectileSize;
-            skillManager.projectileSpeed = skillDetail.projectileSpeed;
-            skillManager.skill_name = skillDetail.skill_name;
-            skillManager.skill_sprite_name = skillDetail.skill_sprite_name;
-            skillManager.type = skillDetail.type;
-            return skillManager;
-        }
 
         public CardManager getCardByIndex(int i) {
             return playerCardManagerList[i];
@@ -674,8 +710,5 @@ namespace Complete
                 //}
             }
         }
-
-        private float seeThroughSizeScaleRate = 3;
-        private float seeThroughSize = 0;
     }
 }

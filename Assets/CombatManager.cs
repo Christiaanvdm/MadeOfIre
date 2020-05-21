@@ -16,12 +16,9 @@ namespace Complete
         //private float nextUpdate = 1; //In seconds
         //private float nextUpdate5 = 1; //In seconds
         //private float updateSize = 0.1f;
-        private bool Key1 = false;
-        private bool Key2 = false;
-        private bool Key3 = false;
-        private bool Key4 = false;
-        private bool Mouse1 = false;
-        private bool Mouse2 = false;
+
+        AttackProjectile playerAttack;
+
         private float nextUpdate = 1f;
         private float duration = 0.5f;
         private bool inMenu = false;
@@ -32,9 +29,9 @@ namespace Complete
         private int uniqueSkillModifierID = 0;
         private GameObject player;
         private PlayerManager playerManager;
-        public List<AttackModifier> AttackModifierList;
-        public List<AttackModifier> SkillModifierList;
-        public List<AttackModifier> TerrainModifierList;
+        public List<ModifierObject> AttackModifierList;
+        public List<ModifierObject> SkillModifierList;
+        public List<ModifierObject> TerrainModifierList;
         private CardManager terrainCard;
         private int playerHealth;
 
@@ -52,10 +49,13 @@ namespace Complete
         private DeckManager deckManager;
         private DeathScreen deathScreen;
 
+        //private SkillDetail playerAttack = new SkillDetail();
+
         public string currentRoom = "StartRoom";
         // Start is called before the first frame update
         void Start()
         {
+
             if (!PlayerPrefs.HasKey("CurrentRoom"))
                 PlayerPrefs.SetString("CurrentRoom", "StartRoom");
             deathScreen = Resources.FindObjectsOfTypeAll<DeathScreen>()[0];
@@ -64,8 +64,8 @@ namespace Complete
             DeckManagerGO.SetActive(false);
             isPlacingTerain = false;
             canvasGameObject = GameObject.Find("HUDUICanvas");
-            AttackModifierList = new List<AttackModifier>();
-            SkillModifierList = new List<AttackModifier>();
+            AttackModifierList = new List<ModifierObject>();
+            SkillModifierList = new List<ModifierObject>();
             player = GameObject.Find("Player");
             playerManager = player.gameObject.GetComponent<PlayerManager>();
             terrainPlacement = GameObject.Find("TerrainPlacement");
@@ -73,8 +73,16 @@ namespace Complete
             healthIcons = new List<GameObject>();
             healthSample = GameObject.Find("Health");
             deckManager = DeckManagerGO.GetComponent<DeckManager>();
+            SetupPlayerAttack();
             UpdateHUDHealth(6);
             SpawnRoom();
+        }
+
+        void SetupPlayerAttack() {
+            playerAttack = Resources.Load<AttackProjectile>("AttackProjectile");
+            playerAttack.speed = 10f;
+            playerAttack.scale = 1f;
+            playerAttack.cooldown = 0.5f;
         }
 
         public void SpawnRoom()
@@ -91,14 +99,7 @@ namespace Complete
         // Update is called once a frame
         void Update()
         {
-            if (!GamePaused)
-            {
-                checkKey();
-            }
-            else
-            {
-                checkMenuKeys();
-            }
+
             if (isPlacingTerain)
             {
                 PlacingTerrain();
@@ -132,32 +133,32 @@ namespace Complete
         {
 
             projectile.allAttackModifiers.AddRange(AttackModifierList);
-            foreach (AttackModifier nextAM in AttackModifierList)
+            foreach (ModifierObject nextAM in AttackModifierList)
             {
                 if (projectile.GetType() == typeof(AttackProjectile))
                 {
-                    if (nextAM.type == "double_size")
+                    if (nextAM.info.type == "double_size")
                     {
-                        projectile.rigidBody.gameObject.transform.localScale = projectile.rigidBody.gameObject.transform.localScale * nextAM.magnitude;
+                        projectile.rigidBody.gameObject.transform.localScale = projectile.rigidBody.gameObject.transform.localScale * nextAM.info.magnitude;
                     }
-                    if (nextAM.type == "double_damage")
+                    if (nextAM.info.type == "double_damage")
                     {
                         //ToDo Make fireball!
                         UpdateProjectileColor(projectile, new Color(1, 0, 0));
                     }
-                    if (nextAM.type == "half_speed")
+                    if (nextAM.info.type == "half_speed")
                     {
                         ApplySlowToProjectile(ref projectile, nextAM);
                     }
-                    if (nextAM.type == "split_shot")
+                    if (nextAM.info.type == "split_shot")
                     {
                         ApplySplitToProjectile(ref projectile, nextAM);
                     }
-                    if (nextAM.type == "chain_shot")
+                    if (nextAM.info.type == "chain_shot")
                     {
                         ApplyChainToProjectile(ref projectile, nextAM);
                     }
-                    if (nextAM.type == "bounce") {
+                    if (nextAM.info.type == "bounce") {
                         AddBounceToProject(ref projectile, nextAM);
                     }
                 }
@@ -165,15 +166,15 @@ namespace Complete
 
         }
 
-        private void ApplyChainToProjectile(ref AttackProjectile projectile, AttackModifier nextAM)
+        private void ApplyChainToProjectile(ref AttackProjectile projectile, ModifierObject nextAM)
         {
-            nextAM.context = "Hit";
+            nextAM.info.context = "Hit";
             projectile.AddModifier(nextAM);
         }
 
 
-        private void AddBounceToProject(ref AttackProjectile projectile, AttackModifier nextAM) {
-            projectile.AddBounces(Mathf.RoundToInt(nextAM.magnitude));
+        private void AddBounceToProject(ref AttackProjectile projectile, ModifierObject nextAM) {
+            projectile.AddBounces(Mathf.RoundToInt(nextAM.info.magnitude));
         }
 
         public void UpdateHUDHealth(int newHP)
@@ -202,15 +203,15 @@ namespace Complete
 
         }
 
-        private void ApplySplitToProjectile(ref AttackProjectile projectile, AttackModifier nextAM)
+        private void ApplySplitToProjectile(ref AttackProjectile projectile, ModifierObject nextAM)
         {
-            nextAM.context = "Birth";
+            nextAM.info.context = "Birth";
             projectile.AddModifier(nextAM);
         }
 
-        private void ApplySlowToProjectile(ref AttackProjectile projectile, AttackModifier nextAM)
+        private void ApplySlowToProjectile(ref AttackProjectile projectile, ModifierObject nextAM)
         {
-            nextAM.context = "Enemy";
+            nextAM.info.context = "Enemy";
             projectile.AddModifier(nextAM);
         }
 
@@ -229,158 +230,33 @@ namespace Complete
 
         }
 
-        void checkMenuKeys()
-        {
-            if (Input.GetKey(KeyCode.Escape))
-            {
-                EscDown();
 
-            }
-            else if (Input.GetKeyUp(KeyCode.Escape))
-            {
-                EscUp();
-            }
-            if (Input.GetKey(KeyCode.Space))
-            {
-                SpaceDown();
-            }
-            else if (Input.GetKeyUp(KeyCode.Space))
-            {
-                SpaceUp();
-            }
-            if (Input.GetKey(KeyCode.Return))
-            {
-                ReturnDown();
-            }
-            else if (Input.GetKeyUp(KeyCode.Return))
-            {
-                ReturnUp();
-            }
-        }
 
-        void SpaceDown()
+        public void SpaceDown()
         {
 
         }
 
-        void CDown() {
+        public void CDown() {
             playerManager.AdvanceConversation();
         }
 
-        void CUp() { }
+        public void CUp() { }
 
-        void ReturnDown() {
-
-        }
-
-        void ReturnUp() {
+        public void ReturnDown() {
 
         }
 
-        void checkKey()
-        {
-            if (playerManager)
-            //&& playerManager.InCombat)
-            {
-                if (Input.GetKey(KeyCode.Q))
-                {
-                    Key1Down();
-
-                }
-                else if (Input.GetKeyUp(KeyCode.Q))
-                {
-                    Key1Up();
-                }
-                if (Input.GetKey(KeyCode.E))
-                {
-                    Key2Down();
-
-                }
-                else if (Input.GetKeyUp(KeyCode.E))
-                {
-                    Key2Up();
-                }
-
-                if (Input.GetKey(KeyCode.R))
-                {
-                    Key3Down();
-
-                }
-                else if (Input.GetKeyUp(KeyCode.R))
-                {
-                    Key3Up();
-                }
-
-                if (Input.GetKey(KeyCode.F))
-                {
-                    Key4Down();
-
-                }
-                else if (Input.GetKeyUp(KeyCode.F))
-                {
-                    Key4Up();
-                }
-
-            }
-            if (Input.GetMouseButtonDown(0))
-            {
-                Mouse1Down();
-            }
-            else if (Input.GetMouseButtonUp(0))
-            {
-                Mouse1Up();
-            }
-
-            if (Input.GetMouseButtonDown(1))
-            {
-                Mouse2Down();
-            }
-            else if (Input.GetMouseButtonUp(1))
-            {
-                Mouse2Up();
-            }
-            if (Input.GetKey(KeyCode.Escape))
-            {
-                EscDown();
-
-            }
-            else if (Input.GetKeyUp(KeyCode.Escape))
-            {
-                EscUp();
-            }
-            if (Input.GetKey(KeyCode.Space))
-            {
-                SpaceDown();
-            }
-            else if (Input.GetKeyUp(KeyCode.Space))
-            {
-                SpaceUp();
-            }
-            if (Input.GetKey(KeyCode.F1))
-            {
-                F1Down();
-            }
-            else if (Input.GetKeyUp(KeyCode.F1))
-            {
-                F1Up();
-            }
-            if (Input.GetKey(KeyCode.C))
-            {
-                CDown();
-            }
-            else if (Input.GetKeyUp(KeyCode.C))
-            {
-                CUp();
-            }
+        public void ReturnUp() {
 
         }
 
-        void F1Down()
+        public void F1Down()
         {
 
         }
 
-        void F1Up()
+        public void F1Up()
         {
             if (inMenu)
             {
@@ -393,11 +269,11 @@ namespace Complete
             }
         }
 
-        void EscDown()
+        public void EscDown()
         {
         }
 
-        void SpaceUp()
+        public void SpaceUp()
         {
             if (inMenu)
             {
@@ -440,7 +316,7 @@ namespace Complete
             deathScreen.gameObject.SetActive(true);
         }
 
-        void EscUp()
+        public void EscUp()
         {
 
             if (inMenu)
@@ -454,9 +330,9 @@ namespace Complete
             }
         }
 
-        void Key1Down()
+        public void Key1Down()
         {
-            Key1 = true;
+
             CancelTerrainPlacement();
             GameObject card1 = GameObject.Find("Card1");
             CardManager cardManager = card1.GetComponent<CardManager>();
@@ -466,20 +342,32 @@ namespace Complete
 
         }
 
-        void Key1Up()
+        public void Key1Up()
         {
-            Key1 = false;
+
             GameObject card1 = GameObject.Find("Card1");
             CardManager cardManager = card1.GetComponent<CardManager>();
             cardManager.isDraggingThisCard = false;
             isDraggingACard = false;
-            cardManager.OnMouseUp();
-
+            executeCard(cardManager);
         }
 
-        void Key2Down()
+        private void executeCard(CardManager cardManager) {
+            if (cardManager.isActive)
+            {
+                if (!cardManager.skillManager)
+                {
+                    cardManager.skillManager = cardManager.gameObject.GetComponent<SkillManager>();
+                }
+                cardManager.skillManager.ExecuteSkill(this);
+                cardManager.SnapToAttention();
+                cardManager.DiscardCard();
+            }
+        }
+
+        public void Key2Down()
         {
-            Key2 = true;
+
             CancelTerrainPlacement();
             GameObject card2 = GameObject.Find("Card2");
             CardManager cardManager = card2.GetComponent<CardManager>();
@@ -488,20 +376,19 @@ namespace Complete
 
         }
 
-        void Key2Up()
+        public void Key2Up()
         {
-            Key2 = false;
             GameObject card2 = GameObject.Find("Card2");
             CardManager cardManager = card2.GetComponent<CardManager>();
             cardManager.isDraggingThisCard = false;
             isDraggingACard = false;
-            cardManager.OnMouseUp();
+            executeCard(cardManager);
 
         }
 
-        void Key3Down()
+        public void Key3Down()
         {
-            Key3 = true;
+
             CancelTerrainPlacement();
             GameObject card3 = GameObject.Find("Card3");
             CardManager cardManager = card3.GetComponent<CardManager>();
@@ -510,20 +397,20 @@ namespace Complete
 
         }
 
-        void Key3Up()
+        public void Key3Up()
         {
-            Key3 = false;
+
             GameObject card3 = GameObject.Find("Card3");
             CardManager cardManager = card3.GetComponent<CardManager>();
             cardManager.isDraggingThisCard = false;
             isDraggingACard = false;
-            cardManager.OnMouseUp();
+            executeCard(cardManager);
 
         }
 
-        void Key4Down()
+        public void Key4Down()
         {
-            Key4 = true;
+
 
             CancelTerrainPlacement();
             GameObject card4 = GameObject.Find("Card4");
@@ -533,20 +420,20 @@ namespace Complete
 
         }
 
-        void Key4Up()
+        public void Key4Up()
         {
-            Key4 = false;
+
             GameObject card4 = GameObject.Find("Card4");
             CardManager cardManager = card4.GetComponent<CardManager>();
             cardManager.isDraggingThisCard = false;
             isDraggingACard = false;
-            cardManager.OnMouseUp();
+            executeCard(cardManager);
 
         }
 
-        void Mouse1Down()
+        public void Mouse1Down()
         {
-            Mouse1 = false;
+
             GameObject cardB = GameObject.Find("CardB");
             CardManager cardManager = cardB.GetComponent<CardManager>();
             //isDraggingACard = true;
@@ -559,19 +446,18 @@ namespace Complete
 
         }
 
-        void Mouse1Up()
+        public void Mouse1Up()
         {
-            Mouse1 = true;
+
             GameObject cardB = GameObject.Find("CardB");
             CardManager cardManager = cardB.GetComponent<CardManager>();
             cardManager.isDraggingThisCard = false;
             isDraggingACard = false;
-            cardManager.OnMouseUp();
+            Attack();
         }
 
-        void Mouse2Down()
+        public void Mouse2Down()
         {
-            Mouse2 = false;
             GameObject cardDR = GameObject.Find("CardDR");
             CardManager cardManager = cardDR.GetComponent<CardManager>();
             isDraggingACard = true;
@@ -579,14 +465,11 @@ namespace Complete
             CancelTerrainPlacement();
         }
 
-        void Mouse2Up()
+        public void Mouse2Up()
         {
-            Mouse2 = true;
             GameObject cardDR = GameObject.Find("CardDR");
             CardManager cardManager = cardDR.GetComponent<CardManager>();
-            //cardManager.isDraggingThisCard = false;
-            //isDraggingACard = false;
-            cardManager.OnMouseUp();
+            executeCard(cardManager);
         }
 
 
@@ -609,11 +492,11 @@ namespace Complete
 
         }
 
-        public void addAttackModifier(AttackModifier newAM, CardManager originCard)
+        public void addAttackModifier(ModifierObject newAM)
         {
             uniqueSpellID++;
 
-            newAM.id = uniqueSpellID;
+            newAM.info.id = uniqueSpellID;
 
             GameObject skillCooldownSample = new GameObject();
             skillCooldownSample = Resources.Load<GameObject>("skillCooldown");
@@ -635,16 +518,16 @@ namespace Complete
 
             Image spriteIcon = newAM.skillCooldownClone.transform.Find("CooldownIcon").gameObject.GetComponent<Image>();
 
-            var skillSprite = Resources.Load<Sprite>(newAM.icon_name);
+            var skillSprite = Resources.Load<Sprite>(newAM.info.icon_name);
             spriteIcon.sprite = skillSprite;
 
             AttackModifierList.Add(newAM);
             startAMCooldown(newAM);
-            originCard.DiscardCard();
+
 
         }
 
-        public void startAMCooldown(AttackModifier attackModifier)
+        public void startAMCooldown(ModifierObject attackModifier)
         {
             if (attackModifier.start)
                 throw new Exception("Start Timer called twice on one attack modifier");
@@ -653,8 +536,8 @@ namespace Complete
             cooldownIcon(attackModifier, skillCooldown);
         }
 
-        private async Task cooldownIcon(AttackModifier attackModifier, Image skillCooldownImage) {
-            var duration = (attackModifier.duration);
+        private async void cooldownIcon(ModifierObject attackModifier, Image skillCooldownImage) {
+            var duration = (attackModifier.info.duration);
             while (skillCooldownImage.fillAmount > 0) {
                 await Task.Delay(Mathf.RoundToInt(Time.fixedDeltaTime * 1000));
                 skillCooldownImage.fillAmount -= (1 / duration) * Time.fixedDeltaTime;
@@ -663,56 +546,54 @@ namespace Complete
             removeAttackModifier(attackModifier);
         }
 
-        public void ModifyAttackModifier(AttackModifier amToModify)
+        public void ModifyAttackModifier(ModifierObject amToModify)
         {
             // Apply the amplification
-            foreach (AttackModifier sm in SkillModifierList)
+            foreach (ModifierObject sm in SkillModifierList)
             {
-                if ((sm.type == "double_duration") & (sm.is_enabled == true))
+                if ((sm.info.type == "double_duration") & (sm.info.enabled == true))
                 {
-                    amToModify.duration = amToModify.duration * sm.magnitude;
-                    amToModify.modifier_count += 1;
+                    amToModify.info.duration = amToModify.info.duration * sm.info.magnitude;
+                    amToModify.info.modifier_count += 1;
                     sm.skillCooldownClone.transform.SetParent(amToModify.skillCooldownClone.transform);
 
-                    sm.skillCooldownClone.transform.localPosition = new Vector3(0, (-0.3f - (0.5f * amToModify.modifier_count)) * iconWidth, 0);
-
+                    sm.skillCooldownClone.transform.localPosition = new Vector3(0, (-0.3f - (0.5f * amToModify.info.modifier_count)) * iconWidth, 0);
                 }
 
             }
             // Update all skillmodifier durations (this is done seperately so they all have the total duration)
-            foreach (AttackModifier sm in SkillModifierList)
+            foreach (ModifierObject sm in SkillModifierList)
             {
-                if ((sm.type == "double_duration") & (sm.is_enabled == true))
+                if ((sm.info.type == "double_duration") & (sm.info.enabled == true))
                 {
-                    sm.duration = amToModify.duration;
+                    sm.info.duration = amToModify.info.duration;
                     this.startAMCooldown(sm);
-                    sm.is_enabled = false;
+                    sm.info.enabled = false;
                 }
             }
         }
 
-        public void removeAttackModifier(AttackModifier am_to_remove)
+        public void removeAttackModifier(ModifierObject am_to_remove)
         {
             GameObject skillCooldownSample = new GameObject();
-            skillCooldownSample = GameObject.Find("SkillCooldown");
+            skillCooldownSample = Resources.Load<GameObject>("SkillCooldown");
 
 
-            am_to_remove.is_enabled = false;
+            am_to_remove.info.enabled = false;
 
             int am_to_remove_indx = AttackModifierList.IndexOf(am_to_remove);
-            AttackModifierList.Remove(am_to_remove);
+
             int thisAMCount = AttackModifierList.Count;
 
-            for (int j = am_to_remove_indx; j < thisAMCount; j++)
+            for (int j = am_to_remove_indx; j < thisAMCount - 1; j++)
             {
-
-                AttackModifier nextAM = AttackModifierList[j];
+                ModifierObject nextAM = AttackModifierList[j];
                 if (nextAM.skillCooldownClone)
                 {
                     updateGameObjectXPosition(nextAM.skillCooldownClone, iconWidth * -1);
                 }
             }
-
+            AttackModifierList.Remove(am_to_remove);
             am_to_remove.skillCooldownClone.SetActive(false);
             Destroy(am_to_remove.skillCooldownClone);
             Destroy(am_to_remove);
@@ -728,24 +609,22 @@ namespace Complete
         }
 
         private int uniqueTerainModiferID = 0;
-        public void AddTerainModifier(AttackModifier newTM, CardManager originCard)
+        public void AddTerainModifier(ModifierObject newTM, CardManager originCard)
         {
             uniqueTerainModiferID++;
-            newTM.id = uniqueSkillModifierID;
+            newTM.info.id = uniqueSkillModifierID;
         }
 
 
-        public void addSkillModifier(AttackModifier newSM, CardManager originCard)
+        public void addSkillModifier(ModifierObject newSM)
         {
             uniqueSkillModifierID++;
-            newSM.id = uniqueSkillModifierID;
+            newSM.info.id = uniqueSkillModifierID;
             GameObject skillCooldownSample = new GameObject();
             skillCooldownSample = GameObject.Find("AmplifyCooldown");
-            int thisAMCount = SkillModifierList.Where(x => x.is_enabled).ToList().Count + 1;
+            int thisAMCount = SkillModifierList.Where(x => x.info.enabled).ToList().Count + 1;
 
             newSM.skillCooldownClone = Instantiate(skillCooldownSample, canvasGameObject.transform);
-            //newSM.skillCooldownClone.gameObject.transform.SetPositionAndRotation(new Vector3(-53, -277, 0),
-            //newSM.skillCooldownClone.gameObject.transform.rotation);
             newSM.skillCooldownClone.gameObject.transform.SetPositionAndRotation(
             new Vector3(
                 newSM.skillCooldownClone.gameObject.transform.position.x + (iconWidth),
@@ -754,28 +633,19 @@ namespace Complete
             newSM.skillCooldownClone.gameObject.transform.rotation);
 
             SkillModifierList.Add(newSM);
-            //newSM.startTimer(this, newSM);
-            originCard.DiscardCard();
         }
 
-        public void removeSkillModifier(AttackModifier sm_to_remove)
+        public void removeSkillModifier(ModifierObject sm_to_remove)
         {
             if (sm_to_remove.skillCooldownClone)
             {
                 GameObject skillCooldownSample = new GameObject();
                 skillCooldownSample = GameObject.Find("AmplifyCooldown");
 
-                sm_to_remove.is_enabled = false;
+                sm_to_remove.info.enabled = false;
 
                 int am_to_remove_indx = SkillModifierList.IndexOf(sm_to_remove);
                 SkillModifierList.Remove(sm_to_remove);
-                //int thisAMCount = SkillModifierList.Where(x => !x.is_enabled).ToList().Count;
-
-                //for (int j = am_to_remove_indx; j < thisAMCount; j++)
-                //{
-                //    AttackModifier nextAM = SkillModifierList[j];
-                //    updateGameObjectXPosition(nextAM.skillCooldownClone, iconWidth * -1);
-                //}
 
                 sm_to_remove.skillCooldownClone.SetActive(false);
                 Destroy(sm_to_remove.skillCooldownClone);
@@ -852,6 +722,32 @@ namespace Complete
                                             mousePointOnFloor.y,
                                             mousePointOnFloor.z);
             return mousePointOnFloor;
+        }
+
+        private bool isAttacking = false;
+        public async void Attack()
+        {
+            if (!isAttacking)
+            {
+                isAttacking = true;
+                await asyncAttack();
+                isAttacking = false;
+            }
+
+        }
+
+        public async Task asyncAttack() {
+            Vector3 shotDirection = (FindMousePointRelativeToPlayer() - player.transform.position).normalized;
+            var projectileRigidbody = Resources.Load<Rigidbody>("AttackProjectile");
+
+            Rigidbody projectileInstance = Instantiate(projectileRigidbody, player.transform.position + new Vector3(0, 0.1f, -0.2f), player.transform.rotation) as Rigidbody;
+            projectileInstance.velocity = shotDirection * playerAttack.speed;
+            //projectileInstance.transform.up = new Vector3(0, 1, 0);
+            AttackProjectile nextAP = projectileInstance.GetComponent<AttackProjectile>();
+            nextAP.speed = playerAttack.speed;
+            ModifyProjectile(ref nextAP);
+            nextAP.StartUp();
+            await Task.Delay(playerAttack.cooldown.ToMilliSeconds());
         }
 
     }

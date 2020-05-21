@@ -184,7 +184,8 @@ public class MenuController : MonoBehaviour
 
     public void BrightnessApply()
     {
-        PlayerPrefs.SetFloat("masterBrightness", brightnessEffect.brightness);
+        if (brightnessEffect != null)
+            PlayerPrefs.SetFloat("masterBrightness", brightnessEffect.brightness);
         Debug.Log(PlayerPrefs.GetFloat("masterBrightness"));
         StartCoroutine(ConfirmationBox());
     }

@@ -13,8 +13,8 @@ namespace Complete
     {
         void HitByProjectile(AttackProjectile projectile);
         Transform parentTransform { get; }
-        void addDebuff(AttackModifierBasic attackModifier);
-        void removeDebuff(AttackModifierBasic attackModifier);
+        void addDebuff(ModifierInfo attackModifier);
+        void removeDebuff(ModifierInfo attackModifier);
         void Death();
         void onStart();
 
@@ -32,7 +32,7 @@ namespace Complete
         protected Transform player = null;
         protected bool finalDeath = false;
         protected Quaternion initialRotation;
-        private List<AttackModifierBasic> debuffList;
+        private List<ModifierInfo> debuffList;
 
         public float bulletVelocity { get; set; }
         public float health { get; set; }
@@ -40,7 +40,7 @@ namespace Complete
         // Start is called before the first frame update
         void Start()
         {
-            debuffList = new List<AttackModifierBasic>();
+            debuffList = new List<ModifierInfo>();
             anim = transform.Find("Anim").GetComponent<Animator>();
             navMeshAgent = gameObject.GetComponent<NavMeshAgent>();
             colliderTransform = transform.Find("Collider");
@@ -76,11 +76,11 @@ namespace Complete
             }
         }
 
-        private List<AttackModifierBasic> GroupAttackModifiers(List<AttackModifier> attackModifiers)
+        private List<ModifierInfo> GroupAttackModifiers(List<ModifierObject> attackModifiers)
         {
-            var groupedModifiersList = new List<AttackModifierBasic>();
-            var groupedBirthModifiers = attackModifiers.GroupBy(x => x.type).ToList();
-            AttackModifierBasic nextAm = new AttackModifierBasic();
+            var groupedModifiersList = new List<ModifierInfo>();
+            var groupedBirthModifiers = attackModifiers.GroupBy(x => x.info.type).ToList();
+            ModifierInfo nextAm = new ModifierInfo();
             foreach (var group in groupedBirthModifiers)
             {
                 bool first = true;
@@ -91,14 +91,11 @@ namespace Complete
 
                     if (first)
                     {
-                        nextAm = new AttackModifierBasic();
+                        nextAm = new ModifierInfo();
                         first = false;
                     };
-                    nextAm.duration = item.duration;
-                    nextAm.magnitude += item.magnitude;
-                    nextAm.icon_name = item.icon_name;
-                    nextAm.enabled = item.enabled;
-                    nextAm.type = item.type;
+
+                    nextAm = item.info;
                 }
                 groupedModifiersList.Add(nextAm);
             }
@@ -108,7 +105,7 @@ namespace Complete
 
         public Transform parentTransform => transform;
 
-        protected void applyDebuff(AttackModifierBasic debuff)
+        protected void applyDebuff(ModifierInfo debuff)
         {
             var existingDebuff = debuffList.FirstOrDefault(am => am.type == debuff.type);
             if (existingDebuff != null) {
@@ -124,7 +121,7 @@ namespace Complete
             debuffList.Add(debuff);
         }
 
-        public virtual void removeDebuff(AttackModifierBasic debuff)
+        public virtual void removeDebuff(ModifierInfo debuff)
         {
             if (debuff.type == SkillTypes.Slow)
             {
@@ -134,13 +131,13 @@ namespace Complete
             debuffList.Remove(debuff);
         }
 
-        public virtual void addDebuff(AttackModifierBasic attackModifier)
+        public virtual void addDebuff(ModifierInfo attackModifier)
         {
             StartCoroutine(ApplyAndRemoveDebuff(attackModifier));
         }
 
 
-        IEnumerator ApplyAndRemoveDebuff(AttackModifierBasic am)
+        IEnumerator ApplyAndRemoveDebuff(ModifierInfo am)
         {
             for (int i = 0; i < 1; i++)
             {

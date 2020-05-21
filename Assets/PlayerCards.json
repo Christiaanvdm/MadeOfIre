@@ -5,78 +5,72 @@
       "duration": 4.0,
       "magnitude": 2,
       "type": "half_speed",
-      "projectileSpeed": 10.0,
-      "projectileSize": 1.0,
       "projectileDamage": 0.0,
       "skill_name": "",
       "description": "Half Speed",
       "skill_sprite_name": "HalfSpeed",
-      "cooldown": "1.5"
+      "cooldown": "1.5",
+      "class_name": "SkillModifier"
     },
     {
       "requiresTarget": "attack",
       "duration": 4.0,
       "magnitude": 1,
       "type": "bounce",
-      "projectileSpeed": 10.0,
-      "projectileSize": 1.0,
       "projectileDamage": 0.0,
       "skill_name": "",
       "description": "Bounce",
       "skill_sprite_name": "Bounce",
-      "cooldown": "1.5"
+      "cooldown": "1.5",
+      "class_name": "SkillModifier"
     },
     {
       "requiresTarget": "attack",
       "duration": 4.0,
       "magnitude": 2,
       "type": "half_speed",
-      "projectileSpeed": 10.0,
-      "projectileSize": 1.0,
       "projectileDamage": 0.0,
       "skill_name": "",
       "description": "Half Speed",
       "skill_sprite_name": "HalfSpeed",
-      "cooldown": "1.5"
+      "cooldown": "1.5",
+      "class_name": "SkillModifier"
     },
     {
       "requiresTarget": "ground",
       "duration": 5.0,
       "magnitude": 30,
       "type": "blink",
-      "projectileSpeed": 10.0,
-      "projectileSize": 1.0,
       "projectileDamage": 0.0,
       "skill_name": "",
       "description": "Short Teleport",
       "skill_sprite_name": "Blink",
-      "cooldown": "1.5"
+      "cooldown": "1.5",
+      "class_name": "SkillModifier"
     },
     {
       "requiresTarget": "skill",
-      "duration": 2.0,
-      "magnitude": 2.0,
+      "duration": 1.0,
+      "magnitude": 1.0,
       "type": "double_duration",
-      "projectileSpeed": 10.0,
-      "projectileSize": 1.0,
       "projectileDamage": 0.0,
       "skill_name": "",
       "description": "Duration",
       "skill_sprite_name": "Duration",
-      "cooldown": "1.5"
+      "cooldown": "1.5",
+      "class_name": "SkillModifier"
     },
     {
       "requiresTarget": "skill",
-      "duration": 2.0,
-      "magnitude": 2.0,
+      "duration": 1.0,
+      "magnitude": 1.0,
       "type": "double_duration",
-      "projectileSpeed": 10.0,
-      "projectileSize": 1.0,
       "projectileDamage": 0.0,
       "skill_name": "",
       "description": "Duration",
       "skill_sprite_name": "Duration",
-      "cooldown": "1.5"
+      "cooldown": "1.5",
+      "class_name":  "SkillModifier"
     }
   ]
 }

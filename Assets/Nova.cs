@@ -50,7 +50,7 @@ namespace Complete {
             if (other.tag == "enemy")
             {
                 IEnemyController enemy = other.gameObject.GetComponentInParent<IEnemyController>();
-                AttackModifierBasic newAM = new AttackModifierBasic();
+                ModifierInfo newAM = new ModifierInfo();
                 newAM.type = "half_speed";
                 newAM.duration = NovaEffectDuration;
                 newAM.context = "debuff";

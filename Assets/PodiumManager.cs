@@ -11,10 +11,10 @@ namespace Complete
         private Animator anim;
         private List<GameObject> cards = new List<GameObject>();
         private Vector3 originalScale;
-        private Light light;
+        private Light podium_light;
         private CombatManager combatManager;
         private DeckManager deckManager;
-        private SkillDetail rewardCard = new SkillDetail();
+        private SkillDetail rewardCard = new SkillModifier();
         private bool isActive = true;
         private SpriteRenderer cardSprite;
         private float cardScale = 1.5f;
@@ -24,7 +24,7 @@ namespace Complete
             player = GameObject.Find("Player");
             anim = gameObject.transform.Find("Sprite").gameObject.GetComponent<Animator>();
             SetupCards();
-            light = transform.Find("Light").GetComponent<Light>();
+            podium_light = transform.Find("Light").GetComponent<Light>();
             combatManager = GameObject.Find("SceneManager").GetComponent<CombatManager>();
             deckManager = Resources.FindObjectsOfTypeAll<DeckManager>()[0];
 
@@ -134,7 +134,7 @@ namespace Complete
         {
             try
             {
-                light.gameObject.SetActive(false);
+                podium_light.gameObject.SetActive(false);
             }
             catch
             {
@@ -146,7 +146,7 @@ namespace Complete
         {
             try
             {
-                light.gameObject.SetActive(true);
+                podium_light.gameObject.SetActive(true);
             }
             catch { }
         }

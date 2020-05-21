@@ -11,6 +11,7 @@ namespace Complete
         public float speed = 0f;
         public float knockback = 0.1f;
         public float daze_duration = 0.5f;
+        public float cooldown;
         private bool alive = true;
 
         public int bounces = 0;
@@ -20,17 +21,17 @@ namespace Complete
         public GameObject player;
         private Quaternion originalRotation;
         public Projectile projectile;
-        private CombatManager combatManager;
+
 
         private GameObject childSprite;
         private GameObject exampleProjectile;
         private GameObject exampleSprite;
 
 
-        public List<AttackModifier> enemyModifiers = new List<AttackModifier>();
-        public List<AttackModifier> birthModifiers = new List<AttackModifier>();
-        public List<AttackModifier> allAttackModifiers = new List<AttackModifier>();
-        public List<AttackModifier> hitModifiers = new List<AttackModifier>();
+        public List<ModifierObject> enemyModifiers = new List<ModifierObject>();
+        public List<ModifierObject> birthModifiers = new List<ModifierObject>();
+        public List<ModifierObject> allAttackModifiers = new List<ModifierObject>();
+        public List<ModifierObject> hitModifiers = new List<ModifierObject>();
         private void resetSpriteOrientation()
         {
             childSprite.transform.SetPositionAndRotation(childSprite.transform.position, exampleSprite.transform.rotation);
@@ -45,7 +46,6 @@ namespace Complete
         // Start is called before the first frame update
         void Start()
         {
-            combatManager = GameObject.Find("SceneManager").GetComponent<CombatManager>();
             originalRotation = gameObject.transform.rotation;
             player = GameObject.Find("Player");
             sprite = gameObject.transform.Find("Sprite").gameObject;
@@ -80,17 +80,17 @@ namespace Complete
 
         }
 
-        public void AddModifier(AttackModifier newAM)
+        public void AddModifier(ModifierObject newAM)
         {
-            if (newAM.context == "Birth")
+            if (newAM.info.context == "Birth")
             {
                 birthModifiers.Add(newAM);
             }
-            else if (newAM.context == "Enemy")
+            else if (newAM.info.context == "Enemy")
             {
                 enemyModifiers.Add(newAM);
             }
-            else if (newAM.context == "Hit")
+            else if (newAM.info.context == "Hit")
             {
                 hitModifiers.Add(newAM);
             }
@@ -112,9 +112,9 @@ namespace Complete
 
         private void GroupAttackModifiers()
         {
-            var groupedModifiersList = new List<AttackModifier>();
-            var groupedBirthModifiers = birthModifiers.GroupBy(x => x.type).ToList();
-            AttackModifier nextAm = new AttackModifier();
+            var groupedModifiersList = new List<ModifierObject>();
+            var groupedBirthModifiers = birthModifiers.GroupBy(x => x.info.type).ToList();
+            ModifierObject nextAm = new ModifierObject();
             foreach (var group in groupedBirthModifiers)
             {
                 bool first = true;
@@ -124,14 +124,14 @@ namespace Complete
                         continue;
                     if (first)
                     {
-                        nextAm = new AttackModifier();
+                        nextAm = new ModifierObject();
                         first = false;
                     };
-                    nextAm.duration = item.duration;
-                    nextAm.magnitude += item.magnitude;
-                    nextAm.icon_name = item.icon_name;
-                    nextAm.is_enabled = item.is_enabled;
-                    nextAm.type = item.type;
+                    nextAm.info.duration = item.info.duration;
+                    nextAm.info.magnitude += item.info.magnitude;
+                    nextAm.info.icon_name = item.info.icon_name;
+                    nextAm.info.enabled = item.info.enabled;
+                    nextAm.info.type = item.info.type;
                 }
                 groupedModifiersList.Add(nextAm);
             }
@@ -142,13 +142,13 @@ namespace Complete
         private void Birth()
         {
             Vector3 projectileForward = transform.right * -1;
-            foreach (AttackModifier nextAM in birthModifiers)
+            foreach (ModifierObject nextAM in birthModifiers)
             {
-                if (nextAM.is_enabled && (nextAM.type == "split_shot"))
+                if (nextAM.enabled && (nextAM.info.type == "split_shot"))
                 {
-                    for (int i = 0; i < nextAM.magnitude + 1; i++)
+                    for (int i = 0; i < nextAM.info.magnitude + 1; i++)
                     {
-                        float angleAdjustment = 30 + i * (60 / nextAM.magnitude + 1);
+                        float angleAdjustment = 30 + i * (60 / nextAM.info.magnitude + 1);
                         if (angleAdjustment != 0) {
                             FireAnotherProjectile(offsetDirectionByAngle(rigidBody.velocity.normalized, -30 + angleAdjustment), rigidBody.transform.position);
                         }
@@ -261,9 +261,9 @@ namespace Complete
 
         private void HitEnemy(IEnemyController enemy)
         {
-            foreach (AttackModifier nextAM in hitModifiers)
+            foreach (ModifierObject nextAM in hitModifiers)
             {
-                if (nextAM.is_enabled && nextAM.type == "chain_shot")
+                if (nextAM.enabled && nextAM.info.type == "chain_shot")
                 {
                     FireAnotherProjectileChain(transform.forward, enemy.parentTransform.position);
                 }

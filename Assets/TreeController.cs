@@ -8,14 +8,12 @@ public class TreeController : MonoBehaviour
 {
 
     private Transform sprite;
-    private Transform collider;
     private Transform player;
     // Start is called before the first frame update
     void Start()
     {
         player = Transform.FindObjectOfType<PlayerManager>().transform;
         sprite = transform.Find("Sprite");
-        collider = transform.Find("Collider");
     }
 
     // Update is called once per frame
