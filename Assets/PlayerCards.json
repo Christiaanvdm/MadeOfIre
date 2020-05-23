@@ -10,7 +10,7 @@
       "description": "Half Speed",
       "skill_sprite_name": "HalfSpeed",
       "cooldown": "1.5",
-      "class_name": "SkillModifier"
+      "class_name": "AttackModifier"
     },
     {
       "requiresTarget": "attack",
@@ -22,7 +22,7 @@
       "description": "Bounce",
       "skill_sprite_name": "Bounce",
       "cooldown": "1.5",
-      "class_name": "SkillModifier"
+      "class_name": "AttackModifier"
     },
     {
       "requiresTarget": "attack",
@@ -34,7 +34,7 @@
       "description": "Half Speed",
       "skill_sprite_name": "HalfSpeed",
       "cooldown": "1.5",
-      "class_name": "SkillModifier"
+      "class_name": "AttackModifier"
     },
     {
       "requiresTarget": "ground",
@@ -46,7 +46,7 @@
       "description": "Short Teleport",
       "skill_sprite_name": "Blink",
       "cooldown": "1.5",
-      "class_name": "SkillModifier"
+      "class_name": "BlinkSkill"
     },
     {
       "requiresTarget": "skill",

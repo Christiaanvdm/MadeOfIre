@@ -36,6 +36,7 @@ namespace Complete
         public List<AbstractSkillDetail> current_deck = new List<AbstractSkillDetail>();
         public List<AbstractSkillDetail> draw_pile = new List<AbstractSkillDetail>();
         public List<AbstractSkillDetail> discard_pile = new List<AbstractSkillDetail>();
+
         private List<GameObject> playerCardGameObjectList = new List<GameObject>();
         private List<SkillManager> playerCardSkillManagerList = new List<SkillManager>();
         private List<CardManager> playerCardManagerList = new List<CardManager>();
@@ -47,14 +48,6 @@ namespace Complete
         // Start is called before the first frame update
         void Start()
         {
-            //PlayerState newState = new PlayerState();
-            //SkillModifier skillModifier = new SkillModifier();
-            //skillModifier.context = "something";
-            //newState.current_deck.Add(skillModifier);
-            //var jsonstring = JsonUtility.ToJson(newState);
-            //int i = 0;
-
-
             combatManager = GameObject.Find("SceneManager").GetComponent<CombatManager>();
             player = GameObject.Find("Player");
             rigidBody = gameObject.GetComponent<Rigidbody>();
@@ -86,7 +79,6 @@ namespace Complete
             {
                 updateOrientation();
             }
-            SetEnvironmentSprites();
         }
         private void FixedUpdate()
         {
@@ -115,7 +107,6 @@ namespace Complete
                     flashOn = true;
                 }
             }
-
         }
 
         private void turnSpriteTransparent()
@@ -136,7 +127,8 @@ namespace Complete
             Vector3 mouseRelativeToPlayer = FindMousePointRelativeToPlayerClean() - player.gameObject.transform.position;
 
             float mouseAngle = getForward360Angle(mouseRelativeToPlayer.normalized);
-            if ((mouseAngle >= 0) && (mouseAngle < 22.5)) {
+            if ((mouseAngle >= 0) && (mouseAngle < 22.5))
+            {
                 lookUp();
             }
             else if ((mouseAngle >= 22.5) && (mouseAngle < 67.5))
@@ -304,7 +296,8 @@ namespace Complete
 
         private void CheckForDeath()
         {
-            if (health <= 0) {
+            if (health <= 0)
+            {
                 combatManager.Death();
             }
         }
@@ -331,23 +324,17 @@ namespace Complete
             GameObject colliderGO = collision.collider.gameObject;
             if (colliderGO.tag == "enemy_projectile")
             {
-                    AttackProjectile enemyAP = colliderGO.GetComponent<AttackProjectile>();
+                AttackProjectile enemyAP = colliderGO.GetComponent<AttackProjectile>();
 
-                    if (enemyAP)
-                    {
-                        Damage(enemyAP.damage, "blunt");
-                    }
+                if (enemyAP)
+                {
+                    Damage(enemyAP.damage, "blunt");
+                }
             }
             if (colliderGO.tag == "enemy")
             {
                 Damage(1, "blunt");
             }
-        }
-
-        public void DodgeRoll()
-        {
-
-            dodgeRoll();
         }
 
         private void DodgeRollUp()
@@ -406,7 +393,7 @@ namespace Complete
         }
 
 
-        private void dodgeRoll()
+        public void DodgeRoll()
         {
 
             if (!inDodgeRoll)
@@ -457,7 +444,7 @@ namespace Complete
             }
 
 
-              float speedAngle = getForward360Angle(rigidBody.velocity.normalized);
+            float speedAngle = getForward360Angle(rigidBody.velocity.normalized);
 
 
 
@@ -476,12 +463,12 @@ namespace Complete
             else return 0;
         }
 
-      public void StartDodgeRoll()
+        public void StartDodgeRoll()
         {
             gameObject.layer = 15;
             combatMovement.SetAllKeysAsUp();
             current_orientation = "DR";
-             ControlsDisabled = true;
+            ControlsDisabled = true;
             rigidBody.velocity = rigidBody.velocity * 1.2f;
             StartCoroutine("DodgeRollCoroutine");
 
@@ -516,7 +503,8 @@ namespace Complete
                 readerString = playerCards.text;
                 PlayerPrefs.SetString("Cards", readerString);
             }
-            else {
+            else
+            {
                 readerString = PlayerPrefs.GetString("Cards");
             }
 
@@ -537,26 +525,41 @@ namespace Complete
             }
         }
 
-        private void CreateConcreteSkillAndAddToDeck(SkillDetail sd) {
+        private void CreateConcreteSkillAndAddToDeck(SkillDetail sd)
+        {
             AbstractSkillDetail baseModifier = null;
             if (sd.requiresTarget == SkillTargets.Attack)
             {
-                baseModifier = new AttackModifier();
-
-                baseModifier = MapSkillDetailToAbstract(baseModifier, sd);
-                current_deck.Add(baseModifier);
+                baseModifier = (AbstractSkillDetail)GetAbstractSkillDetailInstance(sd.class_name);
             }
             if (sd.requiresTarget == SkillTargets.Skill)
             {
-                baseModifier = new SkillModifier();
-                baseModifier = MapSkillDetailToAbstract(baseModifier, sd);
-                current_deck.Add(baseModifier);
+                baseModifier = (AbstractSkillDetail)GetAbstractSkillDetailInstance(sd.class_name);
+            }
+            if (sd.requiresTarget == SkillTargets.Ground)
+            {
+                if (sd.type == SkillTypes.Blink)
+                {
+                    baseModifier = (AbstractSkillDetail)GetAbstractSkillDetailInstance(sd.class_name);
+                }
+                else if (sd.type == SkillTypes.Glacier)
+                {
+                    baseModifier = (AbstractSkillDetail)GetAbstractSkillDetailInstance(sd.class_name);
+                }
             }
 
-
+            baseModifier = MapSkillDetailToAbstract(baseModifier, sd);
+            current_deck.Add(baseModifier);
         }
 
-        private AbstractSkillDetail MapSkillDetailToAbstract(AbstractSkillDetail am, SkillDetail sd) {
+        private AbstractSkillDetail GetAbstractSkillDetailInstance(string strFullyQualifiedName)
+        {
+            var result = System.Reflection.Assembly.GetExecutingAssembly().CreateInstance($"Complete.{strFullyQualifiedName}");
+            return (AbstractSkillDetail)result;
+        }
+
+        private AbstractSkillDetail MapSkillDetailToAbstract(AbstractSkillDetail am, SkillDetail sd)
+        {
             am.class_name = sd.class_name;
             am.context = sd.context;
             am.cooldown = sd.cooldown;
@@ -576,6 +579,11 @@ namespace Complete
             return am;
         }
 
+        public AbstractSkillDetail GetInstanceFromSkillDetail(SkillDetail sd) {
+            AbstractSkillDetail am = GetAbstractSkillDetailInstance(sd.class_name);
+            return MapSkillDetailToAbstract(am, sd);
+        }
+
         IEnumerator slightlyAfterStart()
         {
             yield return new WaitForFixedUpdate();
@@ -589,28 +597,16 @@ namespace Complete
 
         public void DrawCard(string cardIdentifier, bool AddToDiscardPile = true)
         {
-             if (draw_pile.Count == 0)
+            if (draw_pile.Count == 0)
             {
                 ShuffleDiscardToDrawPile();
             }
 
             GameObject nextSlot = GameObject.Find(cardIdentifier);
             SkillManager oldSkillManager = nextSlot.GetComponent<SkillManager>();
-            AbstractSkillDetail oldSkillDetail = null;
+            AbstractSkillDetail oldSkillDetail = oldSkillManager.info;
             if (oldSkillManager.info == null)
                 oldSkillManager.info = new AttackModifier();
-            if (oldSkillManager.info.class_name == "SkillModifier")
-            {
-                AbstractSkillDetail sm = new SkillModifier();
-                sm = oldSkillManager.info;
-                oldSkillDetail = sm;
-            }
-            else if (oldSkillManager.info.class_name == "AttackModifier")
-            {
-                AbstractSkillDetail am = new AttackModifier();
-                am = oldSkillManager.info;
-                oldSkillDetail = am;
-            }
             if (AddToDiscardPile)
             {
                 discard_pile.Add(oldSkillDetail);
@@ -665,7 +661,8 @@ namespace Complete
         }
 
 
-        public CardManager getCardByIndex(int i) {
+        public CardManager getCardByIndex(int i)
+        {
             return playerCardManagerList[i];
         }
 
@@ -673,42 +670,16 @@ namespace Complete
         public void AdvanceConversation()
         {
             Collider[] hitColliders = Physics.OverlapSphere(transform.position, 3);
-            foreach (Collider collider in hitColliders) {
-                if (collider.gameObject.tag == "npc") {
+            foreach (Collider collider in hitColliders)
+            {
+                if (collider.gameObject.tag == "npc")
+                {
                     collider.transform.GetComponent<NPCController>().advanceStep();
                 }
             }
         }
 
 
-        private void SetEnvironmentSprites()
-        {
-                                RaycastHit hit;
-            var cameraPos = Camera.main.transform.position;
-            if (Physics.Raycast(cameraPos, transform.position - cameraPos, out hit, Mathf.Infinity))
-            {
 
-                //if (hit.collider.gameObject.tag == "player")
-                //{
-                //    character.GetComponent<SpriteRenderer>().sortingLayerID = 2;
-                //    //var renderer = transform.Find("Sphere").GetComponent<Renderer>();
-                //    //if (seeThroughSize > 0) {
-                //    //    seeThroughSize -= seeThroughSizeScaleRate * Time.deltaTime;
-                //    //}
-                //    //renderer.material.SetFloat("_ScaleX", seeThroughSize);
-                //    //renderer.material.SetFloat("_ScaleY", seeThroughSize);
-                //}
-                //else {
-                //    character.GetComponent<SpriteRenderer>().sortingLayerID = 0;
-                //    //var renderer = transform.Find("Sphere").GetComponent<Renderer>();
-                //    //if (seeThroughSize < 2)
-                //    //{
-                //    //    seeThroughSize += seeThroughSizeScaleRate * Time.deltaTime;
-                //    //}
-                //    //renderer.material.SetFloat("_ScaleX", seeThroughSize);
-                //    //renderer.material.SetFloat("_ScaleY", seeThroughSize);
-                //}
-            }
-        }
     }
 }

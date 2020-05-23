@@ -1,8 +1,13 @@
 ﻿using JetBrains.Annotations;
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Rendering;
@@ -13,8 +18,8 @@ namespace Complete
     {
         void HitByProjectile(AttackProjectile projectile);
         Transform parentTransform { get; }
-        void addDebuff(ModifierInfo attackModifier);
-        void removeDebuff(ModifierInfo attackModifier);
+        void addDebuff(SkillDetail attackModifier);
+        void removeDebuff(Debuff attackModifier);
         void Death();
         void onStart();
 
@@ -32,7 +37,7 @@ namespace Complete
         protected Transform player = null;
         protected bool finalDeath = false;
         protected Quaternion initialRotation;
-        private List<ModifierInfo> debuffList;
+        private List<Debuff> debuffList;
 
         public float bulletVelocity { get; set; }
         public float health { get; set; }
@@ -40,7 +45,7 @@ namespace Complete
         // Start is called before the first frame update
         void Start()
         {
-            debuffList = new List<ModifierInfo>();
+            debuffList = new List<Debuff>();
             anim = transform.Find("Anim").GetComponent<Animator>();
             navMeshAgent = gameObject.GetComponent<NavMeshAgent>();
             colliderTransform = transform.Find("Collider");
@@ -51,7 +56,8 @@ namespace Complete
         }
 
         public virtual void onStart() { }
-        public virtual void ApplyProjectile(AttackProjectile projectile) {
+        public virtual void ApplyProjectile(AttackProjectile projectile)
+        {
             health -= projectile.damage;
             if (health < 0)
             {
@@ -63,7 +69,8 @@ namespace Complete
         public void HitByProjectile(AttackProjectile projectile)
         {
 
-            foreach (var am in GroupAttackModifiers(projectile.enemyModifiers))
+            var groupedAttackModifiers = GroupAttackModifiers(projectile.enemyModifiers);
+            foreach (var am in groupedAttackModifiers)
             {
                 addDebuff(am);
             }
@@ -71,57 +78,63 @@ namespace Complete
             {
                 health -= projectile.damage;
             }
-            else {
+            else
+            {
                 Death();
             }
         }
 
-        private List<ModifierInfo> GroupAttackModifiers(List<ModifierObject> attackModifiers)
+        private List<SkillDetail> GroupAttackModifiers(List<ModifierObject> attackModifiers)
         {
-            var groupedModifiersList = new List<ModifierInfo>();
+            var groupedModifiersList = new List<SkillDetail>();
             var groupedBirthModifiers = attackModifiers.GroupBy(x => x.info.type).ToList();
-            ModifierInfo nextAm = new ModifierInfo();
+            SkillDetail nextAm = new SkillDetail();
             foreach (var group in groupedBirthModifiers)
             {
                 bool first = true;
                 foreach (var item in group)
                 {
-                    if (item == null)
+                    if (item.info == null)
                         continue;
 
                     if (first)
                     {
-                        nextAm = new ModifierInfo();
-                        first = false;
-                    };
+                        nextAm = new SkillDetail();
+                        nextAm = item.info;
 
-                    nextAm = item.info;
+                        first = false;
+                    }
+                    else {
+                        nextAm.magnitude += item.info.magnitude;
+                    }
                 }
                 groupedModifiersList.Add(nextAm);
             }
 
-            return groupedModifiersList;
+             return groupedModifiersList;
         }
 
         public Transform parentTransform => transform;
 
-        protected void applyDebuff(ModifierInfo debuff)
+        protected void applyDebuff(Debuff debuff)
         {
             var existingDebuff = debuffList.FirstOrDefault(am => am.type == debuff.type);
-            if (existingDebuff != null) {
-                existingDebuff.enabled = false;
-                removeDebuff(existingDebuff);
+            if (existingDebuff != null)
+            {
+                debuff.cancellationToken.Cancel();
+
                 debuffList.Remove(existingDebuff);
             }
 
-            if (debuff.type == SkillTypes.Slow) {
+            if (debuff.type == SkillTypes.Slow)
+            {
                 navMeshAgent.speed = navMeshAgent.speed / debuff.magnitude;
             }
 
             debuffList.Add(debuff);
         }
 
-        public virtual void removeDebuff(ModifierInfo debuff)
+        public virtual void removeDebuff(Debuff debuff)
         {
             if (debuff.type == SkillTypes.Slow)
             {
@@ -131,25 +144,41 @@ namespace Complete
             debuffList.Remove(debuff);
         }
 
-        public virtual void addDebuff(ModifierInfo attackModifier)
+        public virtual void addDebuff(SkillDetail debuff)
         {
-            StartCoroutine(ApplyAndRemoveDebuff(attackModifier));
+            Debuff newDebuff = new Debuff();
+            newDebuff = MapObject(debuff);
+
+            ApplyAndRemoveDebuff(newDebuff.cancellationToken, newDebuff);
         }
 
-
-        IEnumerator ApplyAndRemoveDebuff(ModifierInfo am)
+        public Debuff MapObject(SkillDetail sd)
         {
-            for (int i = 0; i < 1; i++)
+            var result = new Debuff();
+            result.magnitude = sd.magnitude;
+            result.cooldown = sd.cooldown;
+            result.duration = sd.duration;
+            result.class_name = sd.class_name;
+            result.context = sd.context;
+            result.type = sd.type;
+            return result;
+        }
+
+        private async Task ApplyAndRemoveDebuff(CancellationTokenSource cts, Debuff newDebuff)
+        {
+            try
             {
-                applyDebuff(am);
-                yield return new WaitForSeconds(am.duration);
-            }
-            if (am.enabled == true) {
-                removeDebuff(am);
-            }
+                applyDebuff(newDebuff);
+                await Task.Delay(newDebuff.duration.ToMilliSeconds(), cts.Token);
 
-            yield break;
+            }
+            catch
+            {
+            }
+            finally {
+                removeDebuff(newDebuff);
+            }
         }
-
     }
+
 }

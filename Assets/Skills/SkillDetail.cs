@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Complete
 {
 
-    [System.Serializable]
+    [Serializable]
     public class SkillDetail
     {
         public string requiresTarget;
@@ -35,7 +36,12 @@ namespace Complete
         public abstract void Execute(CombatManager context);
     }
 
-    [System.Serializable]
+    public class Debuff : SkillDetail
+    {
+        public CancellationTokenSource cancellationToken = new CancellationTokenSource();
+    }
+
+    [Serializable]
     public class SkillModifier : AbstractSkillDetail
     {
         public override void Execute(CombatManager context)
@@ -50,7 +56,7 @@ namespace Complete
         }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class AttackModifier : AbstractSkillDetail
     {
         public override void Execute(CombatManager context)
@@ -62,6 +68,71 @@ namespace Complete
             am.info.icon_name = skill_sprite_name + "Icon";
 
             context.addAttackModifier(am);
+        }
+    }
+
+    [Serializable]
+    public class BlinkSkill : AbstractSkillDetail
+    {
+        private Animator blinkAnim;
+        private GameObject blinkAnimation;
+        public override void Execute(CombatManager context)
+        {
+            blinkAnimation = Resources.Load<GameObject>("Skills/BlinkAnimation");
+            blinkAnim = blinkAnimation.GetComponent<Animator>();
+            context.player.transform.position = FindMousePointRelativeToPlayerWithPlayerY(context.player);
+
+            blinkAnim.Play("Arive");
+
+            blinkAnimation.transform.position = context.player.transform.position;
+        }
+
+        Vector3 FindMousePointRelativeToPlayerWithPlayerY(GameObject player)
+        {
+            Vector3 mousePointOnFloor = FindMousePointOnFloor();
+            mousePointOnFloor = new Vector3(mousePointOnFloor.x,
+                                            player.transform.position.y,
+                                            mousePointOnFloor.z);
+            return mousePointOnFloor;
+        }
+
+        Vector3 FindMousePointOnFloor()
+        {
+            Vector3 mousePointOnFloor = new Vector3(0, 0, 0);
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit[] hits = Physics.RaycastAll(ray);
+
+            foreach (RaycastHit hit in hits)
+            {
+                if (hit.collider.gameObject.tag == "ground")
+                {
+                    mousePointOnFloor = hit.point;
+                }
+            }
+            return mousePointOnFloor;
+        }
+    }
+
+    [Serializable]
+    public class PlaceTerrain : AbstractSkillDetail
+    {
+        public override void Execute(CombatManager context)
+        {
+            //combatManager.StartPlacingTerrain(cardManager);
+            //AttackModifier spawnGlacier = MainCanvas.AddComponent<AttackModifier>();
+            //spawnGlacier.duration = duration;
+            //spawnGlacier.magnitude = magnitude;
+            //spawnGlacier.type = type;
+            //spawnGlacier.icon_name = skill_sprite_name + "Icon";
+            ////doubleDuration.transform.SetParent(MainCanvas.transform);
+            //combatManager.addAttackModifier(spawnGlacier, cardManager);
+        }
+    }
+
+    public class DodgeRoll : AbstractSkillDetail {
+        public override void Execute(CombatManager context)
+        {
+            context.playerManager.DodgeRoll();
         }
     }
 }

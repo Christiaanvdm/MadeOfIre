@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using UnityEngine.AI;
 using System;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace Complete
 {
@@ -18,6 +19,7 @@ namespace Complete
         //private float updateSize = 0.1f;
 
         AttackProjectile playerAttack;
+        public TextAsset allCardsFile;
 
         private float nextUpdate = 1f;
         private float duration = 0.5f;
@@ -27,12 +29,13 @@ namespace Complete
         public bool isDraggingACard = false;
         private int uniqueSpellID = 0;
         private int uniqueSkillModifierID = 0;
-        private GameObject player;
-        private PlayerManager playerManager;
+        public GameObject player;
+        public PlayerManager playerManager;
         public List<ModifierObject> AttackModifierList;
         public List<ModifierObject> SkillModifierList;
         public List<ModifierObject> TerrainModifierList;
         private CardManager terrainCard;
+        public List<AbstractSkillDetail> allCards = new List<AbstractSkillDetail>();
         private int playerHealth;
 
         public GameObject canvasGameObject;
@@ -58,6 +61,7 @@ namespace Complete
 
             if (!PlayerPrefs.HasKey("CurrentRoom"))
                 PlayerPrefs.SetString("CurrentRoom", "StartRoom");
+
             deathScreen = Resources.FindObjectsOfTypeAll<DeathScreen>()[0];
             deathScreen.gameObject.SetActive(false);
             DeckManagerGO = Resources.FindObjectsOfTypeAll<DeckManager>()[0].gameObject;
@@ -76,7 +80,20 @@ namespace Complete
             SetupPlayerAttack();
             UpdateHUDHealth(6);
             SpawnRoom();
+            LoadAllCards();
         }
+
+        private void LoadAllCards() {
+            var readerString = allCardsFile.text;
+            PlayerState allCardsState = JsonUtility.FromJson<PlayerState>(readerString);
+
+            foreach (var card in allCardsState.current_deck)
+            {
+                allCards.Add(playerManager.GetInstanceFromSkillDetail(card));
+            }
+        }
+
+
 
         void SetupPlayerAttack() {
             playerAttack = Resources.Load<AttackProjectile>("AttackProjectile");
@@ -311,7 +328,7 @@ namespace Complete
 
         public void Death()
         {
-            //PauseGame();
+            PauseGame();
             //inMenu = true;
             deathScreen.gameObject.SetActive(true);
         }
@@ -359,7 +376,7 @@ namespace Complete
                 {
                     cardManager.skillManager = cardManager.gameObject.GetComponent<SkillManager>();
                 }
-                cardManager.skillManager.ExecuteSkill(this);
+                cardManager.skillManager.info.Execute(this);
                 cardManager.SnapToAttention();
                 cardManager.DiscardCard();
             }
@@ -469,6 +486,7 @@ namespace Complete
         {
             GameObject cardDR = GameObject.Find("CardDR");
             CardManager cardManager = cardDR.GetComponent<CardManager>();
+            cardManager.skillManager.info = allCards.First<AbstractSkillDetail>(x => x.type == "dodge_roll");
             executeCard(cardManager);
         }
 
@@ -540,7 +558,10 @@ namespace Complete
             var duration = (attackModifier.info.duration);
             while (skillCooldownImage.fillAmount > 0) {
                 await Task.Delay(Mathf.RoundToInt(Time.fixedDeltaTime * 1000));
-                skillCooldownImage.fillAmount -= (1 / duration) * Time.fixedDeltaTime;
+                if (skillCooldownImage != null)
+                {
+                    skillCooldownImage.fillAmount -= (1 / duration) * Time.fixedDeltaTime;
+                }
             }
 
             removeAttackModifier(attackModifier);
@@ -575,17 +596,15 @@ namespace Complete
 
         public void removeAttackModifier(ModifierObject am_to_remove)
         {
-            GameObject skillCooldownSample = new GameObject();
-            skillCooldownSample = Resources.Load<GameObject>("SkillCooldown");
-
+            GameObject skillCooldownSample = Resources.Load<GameObject>("SkillCooldown");
 
             am_to_remove.info.enabled = false;
 
             int am_to_remove_indx = AttackModifierList.IndexOf(am_to_remove);
+            AttackModifierList.Remove(am_to_remove);
 
-            int thisAMCount = AttackModifierList.Count;
 
-            for (int j = am_to_remove_indx; j < thisAMCount - 1; j++)
+            for (int j = am_to_remove_indx; j < AttackModifierList.Count - 1; j++)
             {
                 ModifierObject nextAM = AttackModifierList[j];
                 if (nextAM.skillCooldownClone)
@@ -593,7 +612,7 @@ namespace Complete
                     updateGameObjectXPosition(nextAM.skillCooldownClone, iconWidth * -1);
                 }
             }
-            AttackModifierList.Remove(am_to_remove);
+
             am_to_remove.skillCooldownClone.SetActive(false);
             Destroy(am_to_remove.skillCooldownClone);
             Destroy(am_to_remove);
@@ -715,7 +734,7 @@ namespace Complete
             return mousePointOnFloor;
         }
 
-        Vector3 FindMousePointRelativeToPlayer()
+        public Vector3 FindMousePointRelativeToPlayer()
         {
             Vector3 mousePointOnFloor = FindMousePointOnFloor();
             mousePointOnFloor = new Vector3(mousePointOnFloor.x,
