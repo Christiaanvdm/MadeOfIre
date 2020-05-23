@@ -94,6 +94,4 @@ public class EnemyAxeController : EnemyController
         colliderTransform.gameObject.SetActive(false);
         enemySprite.transform.position = new Vector3(transform.position.x, 0.405f, transform.position.z);
     }
-
-    public Transform parentTransform => transform;
 }

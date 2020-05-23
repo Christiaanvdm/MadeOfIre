@@ -63,7 +63,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\AttackModifier.cs" />
     <Compile Include="Assets\AttackProjectile.cs" />
     <Compile Include="Assets\BlinkAnimation.cs" />
     <Compile Include="Assets\CameraController.cs" />
@@ -91,7 +90,10 @@
     <Compile Include="Assets\EnemySpriteManager.cs" />
     <Compile Include="Assets\EnemyZombieController.cs" />
     <Compile Include="Assets\FightStartTrigger.cs" />
+    <Compile Include="Assets\FloatExtensions.cs" />
     <Compile Include="Assets\FloorGenerator.cs" />
+    <Compile Include="Assets\InputManager.cs" />
+    <Compile Include="Assets\ModifierObject.cs" />
     <Compile Include="Assets\Nova.cs" />
     <Compile Include="Assets\NPCController.cs" />
     <Compile Include="Assets\OverlayController.cs" />

@@ -72,3 +72,9 @@ crashlytics-build.properties
 
 # Installed Packages
 /[Pp]ackages/
+
+# Visual Studio Fialso
+/.vs/
+
+Assembly-CSharp.csproj
+obj/Debug/

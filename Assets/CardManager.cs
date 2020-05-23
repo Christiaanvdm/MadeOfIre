@@ -5,13 +5,14 @@ using UnityEngine.UI;
 using System.Runtime.InteropServices;
 
 
-namespace Complete {
+namespace Complete
+{
     public class CardManager : MonoBehaviour
     {
 
 
-        private SkillManager skillManager;
-        private SkillManager_Attack skillManager_Attack;
+        public SkillManager skillManager;
+
         private CombatManager combatManager;
         public int cardType;
 
@@ -21,8 +22,6 @@ namespace Complete {
 
         public Vector3 screenPoint;
         public Vector3 offset;
-        private EnemyManager enemyManager;
-        private float _lockedYPosition;
         public bool isDraggingThisCard;
         public Vector3 initialScale;
         public Vector3 initialOffset;
@@ -39,7 +38,7 @@ namespace Complete {
         private Image canvasCardImage;
         private PlayerManager playerManager;
 
-        private bool isActive = true;
+        public bool isActive = true;
         private Transform cooldownTransform;
         private Vector3 initialCooldownScale;
 
@@ -47,25 +46,20 @@ namespace Complete {
         // Start is called before the first frame update
         void Start()
         {
-            if (cardType == 1) {
+            if (cardType == 1)
+            {
                 cooldownTransform = transform.Find("Cooldown");
                 initialCooldownScale = cooldownTransform.localScale;
             }
 
             canvasCardsGameObject = GameObject.Find("HUDUICanvasCards");
-
-            try
+            if (canvasCardsGameObject != null)
             {
                 canvasCardGO = canvasCardsGameObject.transform.Find(this.gameObject.name + "CanvasCard").gameObject;
                 canvasCardImage = canvasCardGO.GetComponent<Image>();
-                canvasCards = GameObject.Find("HUDUICanvasCards").GetComponent<Canvas>();
+                canvasCards = canvasCardsGameObject.GetComponent<Canvas>();
                 canvasCardImage.fillAmount = 0;
             }
-            catch
-            {
-
-            }
-
 
             playerManager = GameObject.Find("Player").GetComponent<PlayerManager>();
 
@@ -74,6 +68,7 @@ namespace Complete {
             combatManager = GameObject.Find("SceneManager").GetComponent<CombatManager>();
             skillManager = gameObject.GetComponent<SkillManager>();
             rigidBody = gameObject.GetComponent<Rigidbody>();
+
             initialPosition = transform.localPosition;
             initialRotation = transform.localRotation;
             SnapToAttention();
@@ -101,12 +96,12 @@ namespace Complete {
         {
             if (cooldownTransform != null)
             {
-                cooldownScale -= 1 / skillManager.cooldown * Time.deltaTime;
+                cooldownScale -= 1 / skillManager.info.cooldown * Time.deltaTime;
                 if (cooldownScale < 0.001)
                     cooldownScale = 0;
                 var cooldownFactor = cooldownScale;
 
-                cooldownTransform.localScale = new Vector3(initialCooldownScale.x, initialCooldownScale.y * cooldownScale, initialCooldownScale.z   );
+                cooldownTransform.localScale = new Vector3(initialCooldownScale.x, initialCooldownScale.y * cooldownScale, initialCooldownScale.z);
             }
         }
 
@@ -146,7 +141,7 @@ namespace Complete {
             //canvasCardImage.fillAmount = 1;
             isActive = false;
             SnapToAttention();
-            discardTime = Time.time + skillManager.cooldown;
+            discardTime = Time.time + skillManager.info.cooldown;
 
             //gameObject.transform.Find("CardBase").gameObject.GetComponent<Renderer>().enabled = false;
             gameObject.transform.Find("Sprite").gameObject.GetComponent<Renderer>().enabled = false;
@@ -162,38 +157,30 @@ namespace Complete {
         private bool mouse_is_over;
         private bool mouse_is_over_enemy;
         private bool tick_tock;
-        private void SnapToAttention()
+        public void SnapToAttention()
         {
-            //try
-            //{
-                float max = 100f;
-                float min = 75f;
-                float random_x = Random.Range(min, max) / 1000f;
-                if (Random.value > 0.5)
-                    random_x = random_x * -1;
-                float random_y = Random.Range(min, max) / 1000f;
-                if (Random.value > 0.5)
-                    random_y = random_y * -1;
-                float random_z = Random.Range(min, max) / 1000f;
-                if (Random.value > 0.5)
-                    random_z = random_z * -1;
-                transform.localRotation = initialRotation;
-                transform.localPosition = initialPosition;
-                //rigidBody.angularVelocity = new Vector3(0, 0, 0);
-
-                rigidBody.velocity = new Vector3(0, 0, 0);
-                //rigidBody.AddTorque(new Vector3(random_x, random_y, random_z));
-            //}
-            //catch
-            //{
-
-            //}
-
+            gameObject.transform.localPosition = cardPositionBeforeDrag;
+            transform.localScale = initialScale;
+            offset = initialOffset;
+            float max = 100f;
+            float min = 75f;
+            float random_x = Random.Range(min, max) / 1000f;
+            if (Random.value > 0.5)
+                random_x = random_x * -1;
+            float random_y = Random.Range(min, max) / 1000f;
+            if (Random.value > 0.5)
+                random_y = random_y * -1;
+            float random_z = Random.Range(min, max) / 1000f;
+            if (Random.value > 0.5)
+                random_z = random_z * -1;
+            transform.localRotation = initialRotation;
+            transform.localPosition = initialPosition;
+            rigidBody.velocity = new Vector3(0, 0, 0);
         }
         Vector3 start_pos;
-        private Vector3 cardPositionBeforeDrag;
+        public Vector3 cardPositionBeforeDrag;
 
-         public void OnMouseDown()
+        public void OnMouseDown()
         {
             if (isActive)
             {
@@ -215,7 +202,8 @@ namespace Complete {
 
         private void onDraggingThisCard()
         {
-            if (isActive) {
+            if (isActive)
+            {
 
                 transform.localScale = initialScale * scaleMultiplier;
                 //transform.localScale = initialScale * scaleMultiplier;
@@ -238,19 +226,16 @@ namespace Complete {
                 {
                     skillManager = gameObject.GetComponent<SkillManager>();
                 }
-                skillManager.ExecuteSkill();
+                //skillManager.ExecuteSkill();
                 gameObject.transform.localPosition = cardPositionBeforeDrag;
                 isDraggingThisCard = false;
-                if (combatManager) {
+                if (combatManager)
+                {
                     combatManager.isDraggingACard = false;
                 }
-
-
-
                 transform.localScale = initialScale;
                 offset = initialOffset;
                 SnapToAttention();
-
             }
         }
 

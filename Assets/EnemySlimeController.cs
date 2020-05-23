@@ -11,7 +11,7 @@ public class EnemySlimeController : EnemyController
     private Transform circle;
     private Vector3 circleOriginalScale;
     private float circleScale = 0;
-    private SpriteRenderer renderer;
+    private new SpriteRenderer renderer;
     private float explosionRadius = 2.4f;
     private int explosionDamage = 1;
     private bool explosionStarted = false;
@@ -114,9 +114,6 @@ public class EnemySlimeController : EnemyController
 
         yield return null;
     }
-
-
-    private Quaternion initialRotation;
 
     private void MoveTowardsEnemy()
     {
