@@ -1,13 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.AI;
 using System;
 using System.Threading.Tasks;
-using System.IO;
+using System.Threading;
 
 namespace Complete
 {
@@ -41,16 +39,17 @@ namespace Complete
         public GameObject canvasGameObject;
 
         public GameObject terrainPlacement;
-        private Sprite currentTerrain;
+        private GameObject currentTerrain;
         public Vector3 screenPoint;
         public Color currentColor;
-        public bool isPlacingTerain = false;
+        public bool isPlacingTerrain = false;
         public Rigidbody terrainTemplate;
         GameObject healthSample;
         private List<GameObject> healthIcons;
         private GameObject DeckManagerGO;
         private DeckManager deckManager;
         private DeathScreen deathScreen;
+        public CancellationTokenSource terrainCancelationToken = new CancellationTokenSource();
 
         //private SkillDetail playerAttack = new SkillDetail();
 
@@ -58,7 +57,6 @@ namespace Complete
         // Start is called before the first frame update
         void Start()
         {
-
             if (!PlayerPrefs.HasKey("CurrentRoom"))
                 PlayerPrefs.SetString("CurrentRoom", "StartRoom");
 
@@ -66,14 +64,14 @@ namespace Complete
             deathScreen.gameObject.SetActive(false);
             DeckManagerGO = Resources.FindObjectsOfTypeAll<DeckManager>()[0].gameObject;
             DeckManagerGO.SetActive(false);
-            isPlacingTerain = false;
+            isPlacingTerrain = false;
             canvasGameObject = GameObject.Find("HUDUICanvas");
             AttackModifierList = new List<ModifierObject>();
             SkillModifierList = new List<ModifierObject>();
             player = GameObject.Find("Player");
             playerManager = player.gameObject.GetComponent<PlayerManager>();
             terrainPlacement = GameObject.Find("TerrainPlacement");
-            terrainTemplate = GameObject.Find("TerrainTemplate").GetComponent<Rigidbody>();
+            terrainTemplate = Resources.Load<Rigidbody>("TerrainTemplate");
             healthIcons = new List<GameObject>();
             healthSample = GameObject.Find("Health");
             deckManager = DeckManagerGO.GetComponent<DeckManager>();
@@ -93,13 +91,12 @@ namespace Complete
             }
         }
 
-
-
         void SetupPlayerAttack() {
             playerAttack = Resources.Load<AttackProjectile>("AttackProjectile");
             playerAttack.speed = 10f;
             playerAttack.scale = 1f;
             playerAttack.cooldown = 0.5f;
+            playerAttack.damage = 1f;
         }
 
         public void SpawnRoom()
@@ -117,19 +114,20 @@ namespace Complete
         void Update()
         {
 
-            if (isPlacingTerain)
+            if (isPlacingTerrain)
             {
                 PlacingTerrain();
             }
         }
 
+        public void SetCurrentTerrain(GameObject terrain) {
+            currentTerrain = terrain;
+        }
+
         public void PlacingTerrain()
         {
-            screenPoint = Camera.main.WorldToScreenPoint(terrainPlacement.transform.position);
-            Vector3 cursorScreenPoint = FindMousePointRelativeToPlayer();
-            cursorScreenPoint.y = 0;
-            //Vector3 cursorPosition = Camera.main.ScreenToWorldPoint(cursorScreenPoint);
-            terrainPlacement.transform.position = cursorScreenPoint;
+            screenPoint = FindMousePointRelativeToPlayerWithPlayerY(player);
+            currentTerrain.transform.position = screenPoint + new Vector3(0, 1f, 0);
         }
 
         public bool GamePaused = false;
@@ -148,50 +146,11 @@ namespace Complete
 
         public void ModifyProjectile(ref AttackProjectile projectile)
         {
-
             projectile.allAttackModifiers.AddRange(AttackModifierList);
             foreach (ModifierObject nextAM in AttackModifierList)
             {
-                if (projectile.GetType() == typeof(AttackProjectile))
-                {
-                    if (nextAM.info.type == "double_size")
-                    {
-                        projectile.rigidBody.gameObject.transform.localScale = projectile.rigidBody.gameObject.transform.localScale * nextAM.info.magnitude;
-                    }
-                    if (nextAM.info.type == "double_damage")
-                    {
-                        //ToDo Make fireball!
-                        UpdateProjectileColor(projectile, new Color(1, 0, 0));
-                    }
-                    if (nextAM.info.type == "half_speed")
-                    {
-                        ApplySlowToProjectile(ref projectile, nextAM);
-                    }
-                    if (nextAM.info.type == "split_shot")
-                    {
-                        ApplySplitToProjectile(ref projectile, nextAM);
-                    }
-                    if (nextAM.info.type == "chain_shot")
-                    {
-                        ApplyChainToProjectile(ref projectile, nextAM);
-                    }
-                    if (nextAM.info.type == "bounce") {
-                        AddBounceToProject(ref projectile, nextAM);
-                    }
-                }
+                ((AttackModifier)nextAM.info).ApplyAttackModifier(ref projectile, nextAM);
             }
-
-        }
-
-        private void ApplyChainToProjectile(ref AttackProjectile projectile, ModifierObject nextAM)
-        {
-            nextAM.info.context = "Hit";
-            projectile.AddModifier(nextAM);
-        }
-
-
-        private void AddBounceToProject(ref AttackProjectile projectile, ModifierObject nextAM) {
-            projectile.AddBounces(Mathf.RoundToInt(nextAM.info.magnitude));
         }
 
         public void UpdateHUDHealth(int newHP)
@@ -218,18 +177,6 @@ namespace Complete
                 }
             }
 
-        }
-
-        private void ApplySplitToProjectile(ref AttackProjectile projectile, ModifierObject nextAM)
-        {
-            nextAM.info.context = "Birth";
-            projectile.AddModifier(nextAM);
-        }
-
-        private void ApplySlowToProjectile(ref AttackProjectile projectile, ModifierObject nextAM)
-        {
-            nextAM.info.context = "Enemy";
-            projectile.AddModifier(nextAM);
         }
 
         //private bool firstUpdate = false;
@@ -349,7 +296,6 @@ namespace Complete
 
         public void Key1Down()
         {
-
             CancelTerrainPlacement();
             GameObject card1 = GameObject.Find("Card1");
             CardManager cardManager = card1.GetComponent<CardManager>();
@@ -450,22 +396,15 @@ namespace Complete
 
         public void Mouse1Down()
         {
-
-            GameObject cardB = GameObject.Find("CardB");
-            CardManager cardManager = cardB.GetComponent<CardManager>();
-            //isDraggingACard = true;
-            cardManager.isDraggingThisCard = true;
-            if (isPlacingTerain)
-            {
-                PlaceTerrain();
-                return;
-            }
-
         }
 
         public void Mouse1Up()
         {
-
+            if (isPlacingTerrain)
+            {
+                isPlacingTerrain = false;
+                return;
+            }
             GameObject cardB = GameObject.Find("CardB");
             CardManager cardManager = cardB.GetComponent<CardManager>();
             cardManager.isDraggingThisCard = false;
@@ -475,11 +414,12 @@ namespace Complete
 
         public void Mouse2Down()
         {
+            CancelTerrainPlacement();
             GameObject cardDR = GameObject.Find("CardDR");
             CardManager cardManager = cardDR.GetComponent<CardManager>();
             isDraggingACard = true;
             cardManager.isDraggingThisCard = true;
-            CancelTerrainPlacement();
+
         }
 
         public void Mouse2Up()
@@ -495,19 +435,14 @@ namespace Complete
         {
             terrainCard = card;
             terrainPlacement.gameObject.SetActive(true);
-            isPlacingTerain = true;
+            isPlacingTerrain = true;
         }
 
         private void CancelTerrainPlacement()
         {
-            isPlacingTerain = false;
-            terrainPlacement.gameObject.SetActive(false);
-        }
-
-        private void UpdateProjectileColor(AttackProjectile projectile, Color color)
-        {
-            //projectile.UpdateColor(color);
-
+            isPlacingTerrain = false;
+            terrainCancelationToken.Cancel();
+            terrainCancelationToken = new CancellationTokenSource();
         }
 
         public void addAttackModifier(ModifierObject newAM)
@@ -761,13 +696,23 @@ namespace Complete
 
             Rigidbody projectileInstance = Instantiate(projectileRigidbody, player.transform.position + new Vector3(0, 0.1f, -0.2f), player.transform.rotation) as Rigidbody;
             projectileInstance.velocity = shotDirection * playerAttack.speed;
+
             //projectileInstance.transform.up = new Vector3(0, 1, 0);
             AttackProjectile nextAP = projectileInstance.GetComponent<AttackProjectile>();
             nextAP.speed = playerAttack.speed;
+            nextAP.damage = playerAttack.damage;
             ModifyProjectile(ref nextAP);
             nextAP.StartUp();
             await Task.Delay(playerAttack.cooldown.ToMilliSeconds());
         }
 
+        public Vector3 FindMousePointRelativeToPlayerWithPlayerY(GameObject player)
+        {
+            Vector3 mousePointOnFloor = FindMousePointOnFloor();
+            mousePointOnFloor = new Vector3(mousePointOnFloor.x,
+                                            player.transform.position.y,
+                                            mousePointOnFloor.z);
+            return mousePointOnFloor;
+        }
     }
 }

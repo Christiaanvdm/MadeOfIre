@@ -10,7 +10,7 @@
       "description": "Half Speed",
       "skill_sprite_name": "HalfSpeed",
       "cooldown": "1.5",
-      "class_name": "AttackModifier"
+      "class_name": "SlowSkill"
     },
     {
       "requiresTarget": "attack",
@@ -22,7 +22,7 @@
       "description": "Bounce",
       "skill_sprite_name": "Bounce",
       "cooldown": "1.5",
-      "class_name": "AttackModifier"
+      "class_name": "BounceSkill"
     },
     {
       "requiresTarget": "attack",
@@ -34,7 +34,7 @@
       "description": "Half Speed",
       "skill_sprite_name": "HalfSpeed",
       "cooldown": "1.5",
-      "class_name": "AttackModifier"
+      "class_name": "SlowSkill"
     },
     {
       "requiresTarget": "ground",
@@ -58,19 +58,19 @@
       "description": "Duration",
       "skill_sprite_name": "Duration",
       "cooldown": "1.5",
-      "class_name": "SkillModifier"
+      "class_name": "DurationSkill"
     },
     {
-      "requiresTarget": "skill",
-      "duration": 1.0,
-      "magnitude": 1.0,
-      "type": "double_duration",
+      "requiresTarget": "ground",
+      "duration": 5.0,
+      "magnitude": 2,
+      "type": "spawn_glacier",
       "projectileDamage": 0.0,
       "skill_name": "",
-      "description": "Duration",
-      "skill_sprite_name": "Duration",
+      "description": "Create Glacier",
+      "skill_sprite_name": "SpawnGlacier",
       "cooldown": "1.5",
-      "class_name":  "SkillModifier"
+      "class_name": "SpawnGlacier"
     }
   ]
 }

@@ -527,26 +527,7 @@ namespace Complete
 
         private void CreateConcreteSkillAndAddToDeck(SkillDetail sd)
         {
-            AbstractSkillDetail baseModifier = null;
-            if (sd.requiresTarget == SkillTargets.Attack)
-            {
-                baseModifier = (AbstractSkillDetail)GetAbstractSkillDetailInstance(sd.class_name);
-            }
-            if (sd.requiresTarget == SkillTargets.Skill)
-            {
-                baseModifier = (AbstractSkillDetail)GetAbstractSkillDetailInstance(sd.class_name);
-            }
-            if (sd.requiresTarget == SkillTargets.Ground)
-            {
-                if (sd.type == SkillTypes.Blink)
-                {
-                    baseModifier = (AbstractSkillDetail)GetAbstractSkillDetailInstance(sd.class_name);
-                }
-                else if (sd.type == SkillTypes.Glacier)
-                {
-                    baseModifier = (AbstractSkillDetail)GetAbstractSkillDetailInstance(sd.class_name);
-                }
-            }
+            AbstractSkillDetail baseModifier = (AbstractSkillDetail)GetAbstractSkillDetailInstance(sd.class_name);
 
             baseModifier = MapSkillDetailToAbstract(baseModifier, sd);
             current_deck.Add(baseModifier);
@@ -566,7 +547,6 @@ namespace Complete
             am.description = sd.description;
             am.duration = sd.duration;
             am.enabled = sd.enabled;
-            am.icon_name = sd.icon_name;
             am.id = sd.id;
             am.magnitude = sd.magnitude;
             am.projectileDamage = sd.projectileDamage;
@@ -606,7 +586,7 @@ namespace Complete
             SkillManager oldSkillManager = nextSlot.GetComponent<SkillManager>();
             AbstractSkillDetail oldSkillDetail = oldSkillManager.info;
             if (oldSkillManager.info == null)
-                oldSkillManager.info = new AttackModifier();
+                oldSkillManager.info = new SizeSkill();
             if (AddToDiscardPile)
             {
                 discard_pile.Add(oldSkillDetail);
@@ -619,7 +599,7 @@ namespace Complete
             var InActiveSprite = Resources.Load<Sprite>("InactiveCard" + nextCard.skill_sprite_name);
             spriteActiveCardRenderer.sprite = ActiveSprite;
             spriteInactiveCardRenderer.sprite = InActiveSprite;
-            skillManager.info = nextCard;
+           skillManager.info = nextCard;
             draw_pile.Remove(nextCard);
         }
 
@@ -632,8 +612,8 @@ namespace Complete
         public void SavePlayerCards()
         {
             PlayerState playerState = new PlayerState();
-            SkillDetail newSkillDetail = new SkillModifier();
-            newSkillDetail.description = "Some description";
+            //SkillDetail newSkillDetail = new SkillModifier();
+            //newSkillDetail.description = "Some description";
             //playerState.current_deck = current_deck;
             PlayerPrefs.SetString("Cards", JsonUtility.ToJson(playerState));
         }
@@ -642,8 +622,8 @@ namespace Complete
         public void SavePlayerCardsToFile()
         {
             PlayerState playerState = new PlayerState();
-            SkillDetail newSkillDetail = new SkillModifier();
-            newSkillDetail.description = "Some description";
+            //SkillDetail newSkillDetail = new SkillModifier();
+            //newSkillDetail.description = "Some description";
             //playerState.current_deck = current_deck;
             string path = "PlayerCards.json";
             StreamWriter writer = new StreamWriter(path, true);

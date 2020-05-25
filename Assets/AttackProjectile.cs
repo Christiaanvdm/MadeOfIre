@@ -126,12 +126,9 @@ namespace Complete
                     {
                         nextAm = new ModifierObject();
                         first = false;
+                        nextAm.info = item.info;
                     };
-                    nextAm.info.duration = item.info.duration;
                     nextAm.info.magnitude += item.info.magnitude;
-                    nextAm.info.icon_name = item.info.icon_name;
-                    nextAm.info.enabled = item.info.enabled;
-                    nextAm.info.type = item.info.type;
                 }
                 groupedModifiersList.Add(nextAm);
             }
@@ -237,6 +234,10 @@ namespace Complete
                     enemyManager.HitByProjectile(this.GetComponent<AttackProjectile>());
 
                     Bounce();
+                }
+                if (other.gameObject.tag == "terrain") {
+                    IAttackable target = other.gameObject.GetComponentInParent<IAttackable>();
+                    target.HitByProjectile(this.GetComponent<AttackProjectile>());
                 }
                 Bounce();
             }

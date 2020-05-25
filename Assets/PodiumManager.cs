@@ -14,7 +14,7 @@ namespace Complete
         private Light podium_light;
         private CombatManager combatManager;
         private DeckManager deckManager;
-        private SkillDetail rewardCard = new SkillModifier();
+        private SkillDetail rewardCard = new SkillDetail();
         private bool isActive = true;
         private SpriteRenderer cardSprite;
         private float cardScale = 1.5f;

@@ -22,7 +22,7 @@
       "description": "Create Glacier",
       "skill_sprite_name": "SpawnGlacier",
       "cooldown": "1.5",
-      "class_name": "PlaceTerrain"
+      "class_name": "SpawnGlacier"
     },
     {
       "requiresTarget": "attack",
@@ -34,7 +34,7 @@
       "description": "Split Shot",
       "skill_sprite_name": "SplitShot",
       "cooldown": "1.5",
-      "class_name": "AttackModifier"
+      "class_name": "SplitShot"
     },
     {
       "requiresTarget": "attack",
@@ -46,7 +46,7 @@
       "description": "Half Speed",
       "skill_sprite_name": "HalfSpeed",
       "cooldown": "1.5",
-      "class_name": "AttackModifier"
+      "class_name": "SlowSkill"
     },
     {
       "requiresTarget": "skill",
@@ -58,7 +58,7 @@
       "description": "Duration",
       "skill_sprite_name": "Duration",
       "cooldown": "1.5",
-      "class_name": "SkillModifier"
+      "class_name": "DurationSkill"
     },
     {
       "requiresTarget": "attack",
@@ -69,8 +69,7 @@
       "skill_name": "",
       "description": "Size",
       "skill_sprite_name": "Size",
-      "cooldown": "1.5",
-      "class_name": "AttackModifier"
+      "class_name": "SizeSkill"
     },
     {
       "requiresTarget": "attack",
@@ -82,7 +81,7 @@
       "description": "Bounce",
       "skill_sprite_name": "Bounce",
       "cooldown": "1.5",
-      "class_name": "AttackModifier"
+      "class_name": "BounceSkill"
     },
     {
       "requiresTarget": "ground",

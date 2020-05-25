@@ -14,9 +14,9 @@ using UnityEngine.Rendering;
 
 namespace Complete
 {
-    public interface IEnemyController
+    public interface IEnemyController: IAttackable
     {
-        void HitByProjectile(AttackProjectile projectile);
+
         Transform parentTransform { get; }
         void addDebuff(SkillDetail attackModifier);
         void removeDebuff(Debuff attackModifier);
@@ -25,6 +25,11 @@ namespace Complete
 
         float bulletVelocity { get; set; }
         float health { get; set; }
+    }
+
+    public interface IAttackable
+    {
+        void HitByProjectile(AttackProjectile projectile);
     }
 
 

@@ -26,7 +26,7 @@ namespace Complete
         public int modifier_count = 0;
         public int id;
 
-        public string icon_name;
+        public string icon_name => skill_sprite_name + "Icon";
         public bool enabled = true;
         public string context;
     }
@@ -42,33 +42,30 @@ namespace Complete
     }
 
     [Serializable]
-    public class SkillModifier : AbstractSkillDetail
+    public abstract class SkillModifier : AbstractSkillDetail
     {
         public override void Execute(CombatManager context)
         {
             ModifierObject am = new ModifierObject();
-            am.info.duration = duration;
-            am.info.magnitude = magnitude;
-            am.info.type = type;
-            am.info.icon_name = skill_sprite_name + "Icon";
+            am.info = this;
+
 
             context.addSkillModifier(am);
         }
     }
 
     [Serializable]
-    public class AttackModifier : AbstractSkillDetail
+    public abstract class AttackModifier : AbstractSkillDetail
     {
         public override void Execute(CombatManager context)
         {
             ModifierObject am = new ModifierObject();
-            am.info.duration = duration;
-            am.info.magnitude = magnitude;
-            am.info.type = type;
-            am.info.icon_name = skill_sprite_name + "Icon";
+            am.info = this;
 
             context.addAttackModifier(am);
         }
+
+        public abstract void ApplyAttackModifier(ref AttackProjectile projectile, ModifierObject modifier);
     }
 
     [Serializable]
@@ -80,52 +77,45 @@ namespace Complete
         {
             blinkAnimation = Resources.Load<GameObject>("Skills/BlinkAnimation");
             blinkAnim = blinkAnimation.GetComponent<Animator>();
-            context.player.transform.position = FindMousePointRelativeToPlayerWithPlayerY(context.player);
+            context.player.transform.position = context.FindMousePointRelativeToPlayerWithPlayerY(context.player);
 
             blinkAnim.Play("Arive");
 
             blinkAnimation.transform.position = context.player.transform.position;
         }
-
-        Vector3 FindMousePointRelativeToPlayerWithPlayerY(GameObject player)
-        {
-            Vector3 mousePointOnFloor = FindMousePointOnFloor();
-            mousePointOnFloor = new Vector3(mousePointOnFloor.x,
-                                            player.transform.position.y,
-                                            mousePointOnFloor.z);
-            return mousePointOnFloor;
-        }
-
-        Vector3 FindMousePointOnFloor()
-        {
-            Vector3 mousePointOnFloor = new Vector3(0, 0, 0);
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit[] hits = Physics.RaycastAll(ray);
-
-            foreach (RaycastHit hit in hits)
-            {
-                if (hit.collider.gameObject.tag == "ground")
-                {
-                    mousePointOnFloor = hit.point;
-                }
-            }
-            return mousePointOnFloor;
-        }
     }
 
     [Serializable]
-    public class PlaceTerrain : AbstractSkillDetail
+    public class AbstractPlaceTerrain : AbstractSkillDetail
     {
         public override void Execute(CombatManager context)
         {
-            //combatManager.StartPlacingTerrain(cardManager);
-            //AttackModifier spawnGlacier = MainCanvas.AddComponent<AttackModifier>();
-            //spawnGlacier.duration = duration;
-            //spawnGlacier.magnitude = magnitude;
-            //spawnGlacier.type = type;
-            //spawnGlacier.icon_name = skill_sprite_name + "Icon";
-            ////doubleDuration.transform.SetParent(MainCanvas.transform);
-            //combatManager.addAttackModifier(spawnGlacier, cardManager);
+            var result = PlaceTerrain(context.terrainCancelationToken, context);
+        }
+
+        public async Task PlaceTerrain(CancellationTokenSource cancellationTokenSource, CombatManager context) {
+            GameObject terrainGO = new GameObject();
+            TerrainManager terrain;
+            try
+            {
+                terrainGO = GameObject.Instantiate(Resources.Load<GameObject>("TerrainTemplate"));
+                terrain = terrainGO.GetComponent<TerrainManager>();
+                terrainGO.SetActive(true);
+                terrain.DisableColliders();
+                context.SetCurrentTerrain(terrainGO);
+                context.isPlacingTerrain = true;
+                while (context.isPlacingTerrain) {
+                    await Task.Delay(200, cancellationTokenSource.Token);
+                }
+                terrain.Spawn();
+            }
+            catch
+            {
+                terrainGO.SetActive(false);
+            }
+            finally {
+
+            }
         }
     }
 
@@ -135,4 +125,89 @@ namespace Complete
             context.playerManager.DodgeRoll();
         }
     }
+
+    public class SplitShot : AttackModifier
+    {
+        public override void Execute(CombatManager context)
+        {
+            base.Execute(context);
+        }
+
+        public override void ApplyAttackModifier(ref AttackProjectile projectile, ModifierObject modifier)
+        {
+            modifier.info.context = "Birth";
+            projectile.AddModifier(modifier);
+        }
+    }
+
+    public class SizeSkill : AttackModifier
+    {
+        public override void Execute(CombatManager context)
+        {
+            base.Execute(context);
+        }
+
+        public override void ApplyAttackModifier(ref AttackProjectile projectile, ModifierObject modifier)
+        {
+            projectile.rigidBody.gameObject.transform.localScale = projectile.rigidBody.gameObject.transform.localScale * modifier.info.magnitude;
+        }
+    }
+
+    public class DurationSkill : SkillModifier
+    {
+        public override void Execute(CombatManager context)
+        {
+            base.Execute(context);
+        }
+    }
+
+
+    public class SpawnGlacier : AbstractPlaceTerrain
+    {
+        public override void Execute(CombatManager context)
+        {
+            base.Execute(context);
+        }
+    }
+
+    public class SlowSkill : AttackModifier
+    {
+        public override void Execute(CombatManager context)
+        {
+            base.Execute(context);
+        }
+
+        public override void ApplyAttackModifier(ref AttackProjectile projectile, ModifierObject modifier)
+        {
+            modifier.info.context = "Enemy";
+            projectile.AddModifier(modifier);
+        }
+    }
+
+    public class BounceSkill : AttackModifier
+    {
+        public override void Execute(CombatManager context)
+        {
+            base.Execute(context);
+        }
+
+        public override void ApplyAttackModifier(ref AttackProjectile projectile, ModifierObject modifier) {
+            projectile.AddBounces(Mathf.RoundToInt(modifier.info.magnitude));
+        }
+    }
+
+    public class DamageSkill : AttackModifier
+    {
+        public override void Execute(CombatManager context)
+        {
+            base.Execute(context);
+        }
+
+        public override void ApplyAttackModifier(ref AttackProjectile projectile, ModifierObject modifier)
+        {
+            projectile.damage = projectile.damage * modifier.info.magnitude;
+        }
+    }
+
+
 }
